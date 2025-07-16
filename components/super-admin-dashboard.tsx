@@ -20,7 +20,7 @@ import {
   Eye,
   BarChart3,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +53,8 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import { UserManagement } from "./user-management";
+import { UserOverview } from "./user-overview";
 
 export function SuperAdminDashboard() {
   const { currentUser, users, dataEntries, getUsersByAdmin } = useAuthStore();
@@ -114,7 +116,7 @@ export function SuperAdminDashboard() {
 
   // Admin performance data
   const adminPerformanceData = adminStats.map((admin) => ({
-    name: '',
+    name: "",
     users: admin.userCount,
     entries: admin.entryCount,
   }));
@@ -189,6 +191,39 @@ export function SuperAdminDashboard() {
       </div>
     );
   }
+
+  const currentMonthDailyData = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in current month
+
+    const data: { [key: string]: number } = {};
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(currentYear, currentMonth, i);
+      const key = date.toLocaleDateString("en-US", { day: "numeric" }); // Just day number
+      data[key] = 0;
+    }
+
+    dataEntries.forEach((entry) => {
+      const entryDate = new Date(entry.createdAt);
+      if (
+        entryDate.getMonth() === currentMonth &&
+        entryDate.getFullYear() === currentYear
+      ) {
+        const key = entryDate.toLocaleDateString("en-US", { day: "numeric" });
+        if (data.hasOwnProperty(key)) {
+          data[key]++;
+        }
+      }
+    });
+
+    return Object.entries(data).map(([day, count]) => ({
+      day,
+      entries: count,
+    }));
+  }, [dataEntries]);
 
   return (
     <div className="space-y-6">
@@ -287,8 +322,37 @@ export function SuperAdminDashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="border-0 shadow-lg col-span-full">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              <span>Current Month Daily Entries</span>
+            </CardTitle>
+            <CardDescription>
+              Daily data entry activity for the current month
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={currentMonthDailyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="entries"
+                  stroke="#3B82F6"
+                  fill="#3B82F6"
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
         {/* Monthly Entries Chart */}
-        <Card className="border-0 shadow-lg">
+        {/* <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -315,10 +379,10 @@ export function SuperAdminDashboard() {
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Admin Performance Chart */}
-        <Card className="border-0 shadow-lg">
+        {/* <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-green-600" />
@@ -340,7 +404,7 @@ export function SuperAdminDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Daily Activity and Role Distribution */}
@@ -503,7 +567,10 @@ export function SuperAdminDashboard() {
           </CardContent>
         </Card> */}
       </div>
-
+     <div className="space-y-6">
+            <UserManagement />
+            <UserOverview />
+          </div>
       {/* Admin Details Dialog */}
       <Dialog open={viewAdminDetails} onOpenChange={setViewAdminDetails}>
         <DialogContent className="max-w-4xl">

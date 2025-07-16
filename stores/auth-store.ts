@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthState>()(
 
       login: (userName: string, password: string) => {
         const user = get().users.find((u) => u.userName === userName);
-        if (user && password === "password123") {
+        if (user && password === "123") {
           set({ currentUser: user });
           return true;
         }
