@@ -59,14 +59,14 @@ export function UserManagement() {
   });
 
   const canCreateUsers =
-    currentUser?.role === "super_admin" || currentUser?.role === "admin";
+    currentUser?.role === "superadmin" || currentUser?.role === "admin";
   const availableRoles =
-    currentUser?.role === "super_admin" ? ["admin", "user"] : ["user"];
+    currentUser?.role === "superadmin" ? ["admin", "user"] : ["user"];
   // ["admin", "user"]
 
   const displayUsers =
-    currentUser?.role === "super_admin"
-      ? users.filter((u) => u.role !== "super_admin")
+    currentUser?.role === "superadmin"
+      ? users.filter((u) => u.role !== "superadmin")
       : getUsersByAdmin(currentUser?.id || "");
 
   console.log("displayUsers: ", displayUsers);
@@ -122,7 +122,7 @@ export function UserManagement() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case "super_admin":
+      case "superadmin":
         return "bg-red-100 text-red-800";
       // case "admin":
       //   return "bg-blue-100 text-blue-800";

@@ -22,25 +22,25 @@ export function Sidebar() {
       icon: LayoutDashboard,
       label: "Dashboard",
       href: "/dashboard",
-      roles: ["super_admin", "admin"],
+      roles: ["superadmin", "admin"],
     },
     {
       icon: Users,
       label: "User Management",
       href: "/users",
-      roles: ["super_admin", "admin"],
+      roles: ["superadmin", "admin"],
     },
     {
       icon: FileText,
       label: "Data Entries",
       href: "/entries",
-      roles: ["super_admin", "admin", "user"],
+      roles: ["superadmin", "admin", "user"],
     },
     {
       icon: Settings,
       label: "Settings",
       href: "",
-      roles: ["super_admin", "admin"],
+      roles: ["superadmin", "admin"],
     },
   ]
 

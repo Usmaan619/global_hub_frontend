@@ -1,27 +1,53 @@
+// "use client";
+
+// import { useEffect } from "react";
+// import { useRouter } from "next/navigation";
+// import { LoginForm } from "@/components/login-form";
+// import { useAuthStore } from "@/stores/auth-store";
+
+// export default function Home() {
+//   const currentUser = useAuthStore((state) => state.currentUser);
+//   const router = useRouter();
+
+//   console.log("currentUser: ", currentUser);
+//   useEffect(() => {
+//     if (currentUser?.role === "superadmin") {
+//       router.push("/dashboard");
+//     }
+//     if (currentUser?.role === "user") {
+//       router.push("/entries");
+//     }
+//   }, [currentUser, router]);
+
+//   if (currentUser) {
+//     return <div>Redirecting...</div>;
+//   }
+
+//   return <LoginForm />;
+// }
+
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LoginForm } from "@/components/login-form";
 import { useAuthStore } from "@/stores/auth-store";
+import { LoginForm } from "@/components/login-form";
 
-export default function Home() {
-  const currentUser = useAuthStore((state) => state.currentUser);
+export default function LoginPage() {
   const router = useRouter();
+  const currentUser = useAuthStore((state) => state.currentUser);
 
-  console.log("currentUser: ", currentUser);
   useEffect(() => {
-    if (currentUser?.role === "super_admin") {
+    if (currentUser?.role === "superadmin") {
       router.push("/dashboard");
-    }
-    if (currentUser?.role === "user") {
+    } else if (currentUser?.role === "admin") {
+      router.push("/admin");
+    } else if (currentUser?.role === "user") {
       router.push("/entries");
     }
-  }, [currentUser, router]);
+  }, [currentUser]);
 
-  if (currentUser) {
-    return <div>Redirecting...</div>;
-  }
+  if (currentUser) return <div>Redirecting...</div>;
 
   return <LoginForm />;
 }

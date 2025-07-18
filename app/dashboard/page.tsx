@@ -22,13 +22,13 @@ export default function DashboardPage() {
     }
   }, [currentUser, router])
 
-  if (!currentUser) {
-    return <div>Loading...</div>
-  }
+  // if (!currentUser) {
+  //   return <div>Loading...</div>
+  // }
 
   const renderDashboard = () => {
-    switch (currentUser.role) {
-      case "super_admin":
+    switch (currentUser?.role) {
+      case "superadmin":
         return <SuperAdminDashboard />
       // case "admin":
       //   return <AdminDashboard />

@@ -10,7 +10,7 @@ import { useState } from "react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts"
 
 export function Dashboard() {
-  const { currentUser, users, dataEntries, getUsersByAdmin, getDataEntriesByUser } = useAuthStore()
+  const { currentUser, users, dataEntries, getUsersByAdmin , getDataEntriesByUser } = useAuthStore()
   const [showAnalytics, setShowAnalytics] = useState(false)
 
   const generateCSV = (data: any[], filename: string) => {
@@ -48,8 +48,8 @@ export function Dashboard() {
   const exportUsers = () => {
     let usersToExport = []
 
-    if (currentUser?.role === "super_admin") {
-      usersToExport = users.filter((u) => u.role !== "super_admin")
+    if (currentUser?.role === "superadmin") {
+      usersToExport = users.filter((u) => u.role !== "superadmin")
     } else if (currentUser?.role === "admin") {
       usersToExport = getUsersByAdmin(currentUser.id)
     }
@@ -69,7 +69,7 @@ export function Dashboard() {
   const exportDataEntries = () => {
     let entriesToExport = []
 
-    if (currentUser?.role === "super_admin") {
+    if (currentUser?.role === "superadmin") {
       entriesToExport = dataEntries
     } else if (currentUser?.role === "admin") {
       const adminUsers = getUsersByAdmin(currentUser.id)
@@ -95,8 +95,8 @@ export function Dashboard() {
     let allUsers = []
     let allEntries = []
 
-    if (currentUser?.role === "super_admin") {
-      allUsers = users.filter((u) => u.role !== "super_admin")
+    if (currentUser?.role === "superadmin") {
+      allUsers = users.filter((u) => u.role !== "superadmin")
       allEntries = dataEntries
     } else if (currentUser?.role === "admin") {
       allUsers = getUsersByAdmin(currentUser.id)
@@ -122,7 +122,7 @@ export function Dashboard() {
   }
 
   const getStats = () => {
-    if (currentUser?.role === "super_admin") {
+    if (currentUser?.role === "superadmin") {
       const admins = users.filter((u) => u.role === "admin")
       const totalUsers = users.filter((u) => u.role === "user")
       return {
@@ -201,19 +201,19 @@ export function Dashboard() {
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {currentUser?.role === "super_admin" ? "Total Admins" : "My Users"}
+                {currentUser?.role === "superadmin" ? "Total Admins" : "My Users"}
               </CardTitle>
               <UserCheck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                {currentUser?.role === "super_admin" ? stats.admins : stats.users}
+                {currentUser?.role === "superadmin" ? stats.admins : stats.users}
               </div>
             </CardContent>
           </Card>
         )}
 
-        {currentUser?.role === "super_admin" && (
+        {currentUser?.role === "superadmin" && (
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>

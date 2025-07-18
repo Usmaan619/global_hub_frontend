@@ -29,7 +29,7 @@ export default function CreateEntryPage() {
     streetAddress: "",
     city: "",
     zipCode: "",
-    applicantDOB: "",
+    applicantDob: "",
     coApplicantFirstName: "",
     coApplicantLastName: "",
     bestTimeToCall: "",
@@ -71,6 +71,7 @@ export default function CreateEntryPage() {
       })
       return
     }
+    console.log('formData: ', formData);
 
     createDataEntry({
       ...formData,

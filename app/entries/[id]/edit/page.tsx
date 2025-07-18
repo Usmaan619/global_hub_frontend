@@ -32,7 +32,7 @@ export default function EditEntryPage() {
     streetAddress: "",
     city: "",
     zipCode: "",
-    applicantDOB: "",
+    applicantDob: "",
     coApplicantFirstName: "",
     coApplicantLastName: "",
     bestTimeToCall: "",

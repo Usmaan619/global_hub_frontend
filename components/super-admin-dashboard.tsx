@@ -62,7 +62,7 @@ export function SuperAdminDashboard() {
   const [viewAdminDetails, setViewAdminDetails] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  if (!currentUser || currentUser.role !== "super_admin") {
+  if (!currentUser || currentUser.role !== "superadmin") {
     return null;
   }
 
@@ -187,7 +187,7 @@ export function SuperAdminDashboard() {
             ← Back to Dashboard
           </Button>
         </div>
-        <AnalyticsDashboard userRole="super_admin" />
+        <AnalyticsDashboard userRole="superadmin" />
       </div>
     );
   }

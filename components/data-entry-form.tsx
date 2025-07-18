@@ -343,7 +343,7 @@ export function DataEntryForm() {
                         {entry.zipCode}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicantDOB}
+                        {entry.applicantDob}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {entry.coApplicantFirstName}

@@ -26,7 +26,7 @@ import { Calendar, TrendingUp, FileText, Users, Download, Filter } from "lucide-
 import { toast } from "@/hooks/use-toast"
 
 interface AnalyticsProps {
-  userRole: "super_admin" | "admin" | "user"
+  userRole: "superadmin" | "admin" | "user"
 }
 
 export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
@@ -55,7 +55,7 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
       filteredEntries = filteredEntries.filter((entry) => entry.userId === userFilter)
     }
 
-    if (adminFilter !== "all" && userRole === "super_admin") {
+    if (adminFilter !== "all" && userRole === "superadmin") {
       const adminUsers = getUsersByAdmin(adminFilter)
       const userIds = adminUsers.map((u) => u.id)
       filteredEntries = filteredEntries.filter((entry) => userIds.includes(entry.userId))
@@ -169,11 +169,11 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
 
   // Role distribution (for super admin)
   const roleDistributionData = useMemo(() => {
-    if (userRole !== "super_admin") return []
+    if (userRole !== "superadmin") return []
 
     const roleCounts = users.reduce(
       (acc, user) => {
-        if (user.role !== "super_admin") {
+        if (user.role !== "superadmin") {
           acc[user.role] = (acc[user.role] || 0) + 1
         }
         return acc
@@ -217,8 +217,8 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
   }
 
   const availableUsers = useMemo(() => {
-    if (userRole === "super_admin") {
-      return users.filter((u) => u.role !== "super_admin")
+    if (userRole === "superadmin") {
+      return users.filter((u) => u.role !== "superadmin")
     } else if (userRole === "admin" && currentUser) {
       return getUsersByAdmin(currentUser.id)
     }
@@ -226,7 +226,7 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
   }, [userRole, users, currentUser, getUsersByAdmin])
 
   const availableAdmins = useMemo(() => {
-    if (userRole === "super_admin") {
+    if (userRole === "superadmin") {
       return users.filter((u) => u.role === "admin")
     }
     return []
@@ -381,7 +381,7 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
         </Card> */}
 
         {/* Role Distribution (Super Admin only) */}
-        {userRole === "super_admin" && roleDistributionData.length > 0 && (
+        {userRole === "superadmin" && roleDistributionData.length > 0 && (
           // <Card className="border-0 shadow-lg">
           //   <CardHeader>
           //     <CardTitle className="flex items-center space-x-2">

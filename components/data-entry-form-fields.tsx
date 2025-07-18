@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react"; // Removed Copy icon
 import { toast } from "@/hooks/use-toast";
 import type { DataEntry } from "@/stores/auth-store"; // Import DataEntry type
+import { postData } from "@/services/api";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
 type FormData = Omit<DataEntry, "id" | "userId" | "createdAt" | "updatedAt">;
@@ -27,6 +28,9 @@ export function DataEntryFormFields({
   setSelectedImage,
   fileInputRef,
 }: DataEntryFormFieldsProps) {
+  
+  console.log('formData: ', formData);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -82,11 +86,22 @@ export function DataEntryFormFields({
 
   // Removed handlePaste function
 
-  const handleChange = (
+  const handleChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+
+    console.log("e.target: ", e.target);
+    try {
+      // const response = await postData("/create/record", payload);
+      console.log("formData: ", formData);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Create data entry error:", error);
+      return { success: false };
+    }
   };
 
   return (
@@ -239,14 +254,14 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="applicantDOB">
+                <Label htmlFor="applicantDob">
                   Applicant DOB <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="applicantDOB"
+                id="applicantDob"
                 type="text"
-                value={formData.applicantDOB}
+                value={formData.applicantDob}
                 onChange={handleChange}
                 required
               />
