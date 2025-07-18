@@ -11,7 +11,7 @@ import type { DataEntry } from "@/stores/auth-store"; // Import DataEntry type
 import { postData } from "@/services/api";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
-type FormData = Omit<DataEntry, "id" | "userId" | "createdAt" | "updatedAt">;
+type FormData = Omit<DataEntry, "id" | "user_id" | "created_at" | "updated_at">;
 
 interface DataEntryFormFieldsProps {
   formData: FormData;
@@ -28,8 +28,7 @@ export function DataEntryFormFields({
   setSelectedImage,
   fileInputRef,
 }: DataEntryFormFieldsProps) {
-  
-  console.log('formData: ', formData);
+  console.log("formData: ", formData);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,9 +91,7 @@ export function DataEntryFormFields({
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
 
-    console.log("e.target: ", e.target);
     try {
-      // const response = await postData("/create/record", payload);
       console.log("formData: ", formData);
 
       return { success: true };
@@ -169,7 +166,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="recordNo"
-                value={formData.recordNo}
+                value={formData.record_no}
                 onChange={handleChange}
                 required
               />
@@ -182,7 +179,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="leadNo"
-                value={formData.leadNo}
+                value={formData.lead_no}
                 onChange={handleChange}
                 required
               />
@@ -195,7 +192,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="applicantFirstName"
-                value={formData.applicantFirstName}
+                value={formData.applicant_first_name}
                 onChange={handleChange}
                 required
               />
@@ -208,7 +205,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="applicantLastName"
-                value={formData.applicantLastName}
+                value={formData.applicant_last_name}
                 onChange={handleChange}
                 required
               />
@@ -221,7 +218,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="streetAddress"
-                value={formData.streetAddress}
+                value={formData.street_address}
                 onChange={handleChange}
                 required
               />
@@ -247,7 +244,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="zipCode"
-                value={formData.zipCode}
+                value={formData.zip_code}
                 onChange={handleChange}
                 required
               />
@@ -261,7 +258,7 @@ export function DataEntryFormFields({
               <Input
                 id="applicantDob"
                 type="text"
-                value={formData.applicantDob}
+                value={formData.applicant_dob}
                 onChange={handleChange}
                 required
               />
@@ -275,7 +272,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="coApplicantFirstName"
-                value={formData.coApplicantFirstName}
+                value={formData.co_applicant_first_name}
                 onChange={handleChange}
                 required
               />
@@ -288,7 +285,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="coApplicantLastName"
-                value={formData.coApplicantLastName}
+                value={formData.co_applicant_last_name}
                 onChange={handleChange}
                 required
               />
@@ -302,7 +299,7 @@ export function DataEntryFormFields({
               <Input
                 id="bestTimeToCall"
                 type="Text"
-                value={formData.bestTimeToCall}
+                value={formData.best_time_to_call}
                 onChange={handleChange}
                 required
               />
@@ -315,7 +312,7 @@ export function DataEntryFormFields({
               </div>
               <Textarea
                 id="personalRemark"
-                value={formData.personalRemark}
+                value={formData.personal_remark}
                 onChange={handleChange}
                 rows={3}
                 required
@@ -337,7 +334,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="typeOfProperty"
-                value={formData.typeOfProperty}
+                value={formData.type_of_property}
                 onChange={handleChange}
                 required
               />
@@ -351,7 +348,7 @@ export function DataEntryFormFields({
               <Input
                 id="propertyValue"
                 type="text"
-                value={formData.propertyValue}
+                value={formData.property_value}
                 onChange={handleChange}
                 required
               />
@@ -364,7 +361,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="mortgageType"
-                value={formData.mortgageType}
+                value={formData.mortgage_type}
                 onChange={handleChange}
                 required
               />
@@ -378,7 +375,7 @@ export function DataEntryFormFields({
               <Input
                 id="loanAmount"
                 type="text"
-                value={formData.loanAmount}
+                value={formData.loan_amount}
                 onChange={handleChange}
                 required
               />
@@ -391,7 +388,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="loanTerm"
-                value={formData.loanTerm}
+                value={formData.loan_term}
                 onChange={handleChange}
                 required
               />
@@ -404,7 +401,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="interestType"
-                value={formData.interestType}
+                value={formData.interest_type}
                 onChange={handleChange}
                 required
               />
@@ -418,7 +415,7 @@ export function DataEntryFormFields({
               <Input
                 id="monthlyInstallment"
                 type="text"
-                value={formData.monthlyInstallment}
+                value={formData.monthly_installment}
                 onChange={handleChange}
                 required
               />
@@ -431,7 +428,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="existingLoan"
-                value={formData.existingLoan}
+                value={formData.existing_loan}
                 onChange={handleChange}
                 required
               />
@@ -445,7 +442,7 @@ export function DataEntryFormFields({
               <Input
                 id="annualIncome"
                 type="text"
-                value={formData.annualIncome}
+                value={formData.annual_income}
                 onChange={handleChange}
                 required
               />
@@ -459,7 +456,7 @@ export function DataEntryFormFields({
               <Input
                 id="downPayment"
                 type="text"
-                value={formData.downPayment}
+                value={formData.down_payment}
                 onChange={handleChange}
                 required
               />
@@ -472,7 +469,7 @@ export function DataEntryFormFields({
               </div>
               <Textarea
                 id="assetRemark"
-                value={formData.assetRemark}
+                value={formData.asset_remark}
                 onChange={handleChange}
                 rows={3}
                 required
@@ -494,7 +491,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="lenderName"
-                value={formData.lenderName}
+                value={formData.lender_name}
                 onChange={handleChange}
                 required
               />
@@ -508,7 +505,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="loanOfficerFirstName"
-                value={formData.loanOfficerFirstName}
+                value={formData.loan_officer_first_name}
                 onChange={handleChange}
                 required
               />
@@ -521,7 +518,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="loanOfficerLastName"
-                value={formData.loanOfficerLastName}
+                value={formData.loan_officer_last_name}
                 onChange={handleChange}
                 required
               />
@@ -534,7 +531,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="trNumber"
-                value={formData.trNumber}
+                value={formData.tr_number}
                 onChange={handleChange}
                 required
               />
@@ -547,7 +544,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="niNumber"
-                value={formData.niNumber}
+                value={formData.ni_number}
                 onChange={handleChange}
                 required
               />
@@ -574,7 +571,7 @@ export function DataEntryFormFields({
               <Input
                 id="otherIncome"
                 type="text"
-                value={formData.otherIncome}
+                value={formData.other_income}
                 onChange={handleChange}
                 required
               />
@@ -587,7 +584,7 @@ export function DataEntryFormFields({
               </div>
               <Input
                 id="creditCardType"
-                value={formData.creditCardType}
+                value={formData.credit_card_type}
                 onChange={handleChange}
                 required
               />
@@ -601,7 +598,7 @@ export function DataEntryFormFields({
               <Input
                 id="creditScore"
                 type="text"
-                value={formData.creditScore}
+                value={formData.credit_score}
                 onChange={handleChange}
                 required
               />
@@ -614,7 +611,7 @@ export function DataEntryFormFields({
               </div>
               <Textarea
                 id="officialRemark"
-                value={formData.officialRemark}
+                value={formData.official_remark}
                 onChange={handleChange}
                 rows={3}
                 required

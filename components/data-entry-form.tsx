@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore, User } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Search, X } from "lucide-react"; // Removed Copy import
 import { Badge } from "@/components/ui/badge";
+import { getData } from "@/services/api";
 
 export function DataEntryForm() {
   const {
@@ -40,6 +41,12 @@ export function DataEntryForm() {
       ? getDataEntriesByUser(currentUser.id)
       : dataEntries;
 
+  const fetchDataEntries = useAuthStore((state) => state.fetchDataEntries);
+
+  useEffect(() => {
+    fetchDataEntries();
+  }, [currentUser?.role]);
+
   // Enhanced search functionality
   const filteredEntries = useMemo(() => {
     if (!searchTerm.trim()) return userEntries;
@@ -47,19 +54,21 @@ export function DataEntryForm() {
     const searchLower = searchTerm.toLowerCase();
     return userEntries.filter((entry) => {
       const applicantNameMatch =
-        entry.applicantFirstName.toLowerCase().includes(searchLower) ||
-        entry.applicantLastName.toLowerCase().includes(searchLower);
-      const propertyTypeMatch = entry.typeOfProperty
+        entry.applicant_first_name.toLowerCase().includes(searchLower) ||
+        entry.applicant_last_name.toLowerCase().includes(searchLower);
+
+      const propertyTypeMatch = entry.type_of_property
         .toLowerCase()
         .includes(searchLower);
-      const lenderNameMatch = entry.lenderName
+
+      const lenderNameMatch = entry.lender_name
         .toLowerCase()
         .includes(searchLower);
-      const recordNoMatch = entry.recordNo.toLowerCase().includes(searchLower);
+      const recordNoMatch = entry.record_no.toLowerCase().includes(searchLower);
 
       // If super admin or admin, also search by user name
       if (currentUser?.role !== "user") {
-        const user = users.find((u) => u.id === entry.userId);
+        const user = users.find((u) => u.id === entry.user_id);
         const userNameMatch =
           user?.name.toLowerCase().includes(searchLower) || false;
         const userEmailMatch =
@@ -279,10 +288,7 @@ export function DataEntryForm() {
               <TableBody>
                 {filteredEntries.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={35}
-                      className="text-center py-8"
-                    >
+                    <TableCell colSpan={35} className="text-center py-8">
                       <div className="text-gray-500 dark:text-gray-400">
                         {searchTerm
                           ? "No entries found matching your search."
@@ -322,119 +328,119 @@ export function DataEntryForm() {
 
                       {/* Personal Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.recordNo}
+                        {entry.record_no}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.leadNo}
+                        {entry.lead_no}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicantFirstName}
+                        {entry.applicant_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicantLastName}
+                        {entry.applicant_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.streetAddress}
+                        {entry.street_address}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {entry.city}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.zipCode}
+                        {entry.zip_code}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicantDob}
+                        {entry.applicant_dob}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.coApplicantFirstName}
+                        {entry.co_applicant_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.coApplicantLastName}
+                        {entry.co_applicant_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.bestTimeToCall}
+                        {entry.best_time_to_call}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.personalRemark}
+                        {entry.personal_remark}
                       </TableCell>
 
                       {/* Asset Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.typeOfProperty}
+                        {entry.type_of_property}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.propertyValue}
+                        {entry.property_value}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.mortgageType}
+                        {entry.mortgage_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loanAmount}
+                        {entry.loan_amount}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loanTerm}
+                        {entry.loan_term}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.interestType}
+                        {entry.interest_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.monthlyInstallment}
+                        {entry.monthly_installment}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.existingLoan}
+                        {entry.existing_loan}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.annualIncome}
+                        {entry.annual_income}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.downPayment}
+                        {entry.down_payment}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.assetRemark}
+                        {entry.asset_remark}
                       </TableCell>
 
                       {/* Official Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.lenderName}
+                        {entry.lender_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loanOfficerFirstName}
+                        {entry.loan_officer_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loanOfficerLastName}
+                        {entry.loan_officer_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.trNumber}
+                        {entry.tr_number}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.niNumber}
+                        {entry.ni_number}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {entry.occupation}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.otherIncome}
+                        {entry.other_income}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.creditCardType}
+                        {entry.credit_card_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.creditScore}
+                        {entry.credit_score}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.officialRemark}
+                        {entry.official_remark}
                       </TableCell>
 
                       {/* Created By and Timestamp */}
                       {currentUser?.role !== "user" && (
                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                           <Badge variant="outline">
-                            {getUserName(entry.userId)}
+                            {getUserName(entry.user_id)}
                           </Badge>
                         </TableCell>
                       )}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {new Date(entry.createdAt).toLocaleDateString()}
+                        {new Date(entry.created_at).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
                   ))
@@ -447,3 +453,5 @@ export function DataEntryForm() {
     </div>
   );
 }
+
+

@@ -30,8 +30,8 @@ export function AdminDashboard() {
   }
 
   const myUsers = getUsersByAdmin(currentUser.id)
-  const userIds = myUsers.map((u) => u.id)
-  const myUsersDataEntries = dataEntries.filter((entry) => userIds.includes(entry.userId))
+  const user_ids = myUsers.map((u) => u.id)
+  const myUsersDataEntries = dataEntries.filter((entry) => user_ids.includes(entry.user_id))
 
   // Get recent activity
   const recentUsers = myUsers
@@ -39,7 +39,7 @@ export function AdminDashboard() {
     .slice(0, 3)
 
   const recentEntries = myUsersDataEntries
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 5)
 
   // Generate monthly data for admin's users
@@ -54,7 +54,7 @@ export function AdminDashboard() {
     }
 
     myUsersDataEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt)
+      const entryDate = new Date(entry.created_at)
       const key = entryDate.toLocaleDateString("en-US", { month: "short" })
       if (data.hasOwnProperty(key)) {
         data[key]++
@@ -72,7 +72,7 @@ export function AdminDashboard() {
   // User performance data for admin's users
   const userPerformanceData = myUsers
     .map((user) => {
-      const userEntries = dataEntries.filter((entry) => entry.userId === user.id)
+      const userEntries = dataEntries.filter((entry) => entry.user_id === user.id)
       return {
         name: user.name.split(" ")[0], // First name only
         entries: userEntries.length,
@@ -93,7 +93,7 @@ export function AdminDashboard() {
     }
 
     myUsersDataEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt)
+      const entryDate = new Date(entry.created_at)
       const key = entryDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
       if (last14Days.hasOwnProperty(key)) {
         last14Days[key]++
@@ -127,7 +127,7 @@ export function AdminDashboard() {
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Welcome back, {currentUser.name}!</h2>
+            <h2 className="text-2xl font-bold mb-2">Welcome back, {currentUser?.name}!</h2>
             <p className="text-blue-100">Here's what's happening with your team today.</p>
           </div>
           <Button
@@ -173,7 +173,7 @@ export function AdminDashboard() {
             <div className="text-2xl font-bold text-purple-600">
               {
                 myUsers.filter((user) => {
-                  const userEntries = dataEntries.filter((entry) => entry.userId === user.id)
+                  const userEntries = dataEntries.filter((entry) => entry.user_id === user.id)
                   return userEntries.length > 0
                 }).length
               }
@@ -191,7 +191,7 @@ export function AdminDashboard() {
             <div className="text-2xl font-bold text-orange-600">
               {
                 myUsersDataEntries.filter((entry) => {
-                  const entryDate = new Date(entry.createdAt)
+                  const entryDate = new Date(entry.created_at)
                   const weekAgo = new Date()
                   weekAgo.setDate(weekAgo.getDate() - 7)
                   return entryDate > weekAgo
@@ -289,7 +289,7 @@ export function AdminDashboard() {
                 </p>
               ) : (
                 myUsers.map((user) => {
-                  const userEntries = dataEntries.filter((entry) => entry.userId === user.id)
+                  const userEntries = dataEntries.filter((entry) => entry.user_id === user.id)
                   return (
                     <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
@@ -322,7 +322,7 @@ export function AdminDashboard() {
                 <p className="text-muted-foreground text-center py-4">No recent activity from your users.</p>
               ) : (
                 recentEntries.map((entry) => {
-                  const user = myUsers.find((u) => u.id === entry.userId)
+                  const user = myUsers.find((u) => u.id === entry.user_id)
                   return (
                     <div key={entry.id} className="flex items-start space-x-3 p-3 border rounded-lg">
                       {entry.image && (

@@ -54,7 +54,7 @@ export default function DashboardPage() {
                 Dashboard
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-200">
-                Welcome back, {currentUser.name}. Here's what's happening today.
+                Welcome back, {currentUser?.name}. Here's what's happening today.
               </p>
             </div>
             {renderDashboard()}

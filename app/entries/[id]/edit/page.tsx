@@ -1,118 +1,161 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { useAuthStore, type DataEntry } from "@/stores/auth-store"
-import { toast } from "@/hooks/use-toast"
-import { DataEntryFormFields } from "@/components/data-entry-form-fields"
-import { ChevronLeft } from "lucide-react"
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
-import { useThemeStore } from "@/stores/theme-store"
-import { cn } from "@/lib/utils"
+import { useState, useRef, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useAuthStore, type DataEntry } from "@/stores/auth-store";
+import { toast } from "@/hooks/use-toast";
+import { DataEntryFormFields } from "@/components/data-entry-form-fields";
+import { ChevronLeft } from "lucide-react";
+import { Header } from "@/components/layout/header";
+import { Sidebar } from "@/components/layout/sidebar";
+import { useThemeStore } from "@/stores/theme-store";
+import { cn } from "@/lib/utils";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
-type FormData = Omit<DataEntry, "id" | "userId" | "createdAt" | "updatedAt">
+type FormData = Omit<DataEntry, "id" | "user_id" | "created_at" | "updated_at">;
 
 export default function EditEntryPage() {
-  const { currentUser, dataEntries, updateDataEntry } = useAuthStore()
-  const { sidebarCollapsed } = useThemeStore()
-  const router = useRouter()
-  const params = useParams()
-  const entryId = params.id as string
+  const { currentUser, dataEntries, updateDataEntry } = useAuthStore();
+  const { sidebarCollapsed } = useThemeStore();
+  const router = useRouter();
+  const params = useParams();
+  const entryId = params.id as string;
 
   const [formData, setFormData] = useState<FormData>({
-    recordNo: "",
-    leadNo: "",
-    applicantFirstName: "",
-    applicantLastName: "",
-    streetAddress: "",
-    city: "",
-    zipCode: "",
-    applicantDob: "",
-    coApplicantFirstName: "",
-    coApplicantLastName: "",
-    bestTimeToCall: "",
-    personalRemark: "",
-    typeOfProperty: "",
-    propertyValue: "",
-    mortgageType: "",
-    loanAmount: "",
-    loanTerm: "",
-    interestType: "",
-    monthlyInstallment: "",
-    existingLoan: "",
-    annualIncome: "",
-    downPayment: "",
-    assetRemark: "",
-    lenderName: "",
-    loanOfficerFirstName: "",
-    loanOfficerLastName: "",
-    trNumber: "",
-    niNumber: "",
-    occupation: "",
-    otherIncome: "",
-    creditCardType: "",
-    creditScore: "",
-    officialRemark: "",
+    // recordNo: "",
+    // leadNo: "",
+    // applicantFirstName: "",
+    // applicantLastName: "",
+    // streetAddress: "",
+    // city: "",
+    // zipCode: "",
+    // applicantDob: "",
+    // coApplicantFirstName: "",
+    // coApplicantLastName: "",
+    // bestTimeToCall: "",
+    // personalRemark: "",
+    // typeOfProperty: "",
+    // propertyValue: "",
+    // mortgageType: "",
+    // loanAmount: "",
+    // loanTerm: "",
+    // interestType: "",
+    // monthlyInstallment: "",
+    // existingLoan: "",
+    // annualIncome: "",
+    // downPayment: "",
+    // assetRemark: "",
+    // lenderName: "",
+    // loanOfficerFirstName: "",
+    // loanOfficerLastName: "",
+    // trNumber: "",
+    // niNumber: "",
+    // occupation: "",
+    // otherIncome: "",
+    // creditCardType: "",
+    // creditScore: "",
+    // officialRemark: "",
+    // image: "",
+
     image: "",
-  })
-  const [selectedImage, setSelectedImage] = useState<string>("")
-  const [loading, setLoading] = useState(true)
-  const [entryFound, setEntryFound] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+    admin_id: "",
+    record_no: "",
+    lead_no: "",
+    applicant_first_name: "",
+    applicant_last_name: "",
+    street_address: "",
+    city: "",
+    zip_code: "",
+    applicant_dob: "",
+    co_applicant_first_name: "",
+    co_applicant_last_name: "",
+    best_time_to_call: "",
+    personal_remark: "",
+    type_of_property: "",
+    property_value: "",
+    mortgage_type: "",
+    loan_amount: "",
+    loan_term: "",
+    interest_type: "",
+    monthly_installment: "",
+    existing_loan: "",
+    annual_income: "",
+    down_payment: "",
+    asset_remark: "",
+    lender_name: "",
+    loan_officer_first_name: "",
+    loan_officer_last_name: "",
+    tr_number: "",
+    ni_number: "",
+    occupation: "",
+    other_income: "",
+    credit_card_type: "",
+    credit_score: "",
+    official_remark: "",
+  });
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [entryFound, setEntryFound] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log('entryId: ', entryId);
+    console.log('dataEntries: ', dataEntries);
     if (entryId) {
-      const entryToEdit = dataEntries.find((entry) => entry.id === entryId)
+      const entryToEdit = dataEntries.find((entry) => entry.id == (entryId));
+      console.log('entryToEdit: ', entryToEdit);
       if (entryToEdit) {
         // Destructure to exclude id, userId, createdAt, updatedAt
-        const { id, userId, createdAt, updatedAt, ...rest } = entryToEdit
-        setFormData(rest)
-        setSelectedImage(entryToEdit.image)
-        setEntryFound(true)
+        const { id, user_id, created_at, updated_at, ...rest } = entryToEdit;
+        setFormData(rest);
+        setSelectedImage(entryToEdit.image);
+        setEntryFound(true);
       } else {
-        setEntryFound(false)
+        setEntryFound(false);
         toast({
           title: "Entry not found",
           description: "The data entry you are trying to edit does not exist.",
           variant: "destructive",
-        })
-        router.push("/entries") // Redirect if entry not found
+        });
+        router.push("/entries"); // Redirect if entry not found
       }
     }
-    setLoading(false)
-  }, [entryId, dataEntries, router])
+    setLoading(false);
+  }, [entryId, dataEntries, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!currentUser) {
       toast({
         title: "Authentication Error",
         description: "You must be logged in to update an entry.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    updateDataEntry(entryId, formData)
+    updateDataEntry(entryId, formData);
     toast({
       title: "Entry updated",
       description: "Data entry has been updated successfully.",
-    })
-    router.push("/entries") // Redirect back to entries list
-  }
+    });
+    router.push("/entries"); // Redirect back to entries list
+  };
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">Loading entry...</div>
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        Loading entry...
+      </div>
+    );
   }
 
   if (!entryFound) {
-    return null // Or a custom 404 page
+    return null; // Or a custom 404 page
   }
 
   return (
@@ -121,7 +164,7 @@ export default function EditEntryPage() {
       <div
         className={cn(
           "flex-1 flex flex-col overflow-hidden transition-all duration-300",
-          sidebarCollapsed ? "ml-0" : "ml-0",
+          sidebarCollapsed ? "ml-0" : "ml-0"
         )}
       >
         <Header />
@@ -129,8 +172,12 @@ export default function EditEntryPage() {
           <div className="mx-auto">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Data Entry</h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">Update the details for this entry.</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Edit Data Entry
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  Update the details for this entry.
+                </p>
               </div>
               <Button variant="outline" onClick={() => router.push("/entries")}>
                 <ChevronLeft className="h-4 w-4 mr-2" />
@@ -157,5 +204,5 @@ export default function EditEntryPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }
