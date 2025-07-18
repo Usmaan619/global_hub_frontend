@@ -23,7 +23,7 @@ import { useAuthStore, User } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Search, X } from "lucide-react"; // Removed Copy import
 import { Badge } from "@/components/ui/badge";
-import { getData } from "@/services/api";
+import { deleteData, getData } from "@/services/api";
 
 export function DataEntryForm() {
   const {
@@ -92,12 +92,8 @@ export function DataEntryForm() {
     });
   }, [userEntries, searchTerm, currentUser?.role, users]);
 
-  const handleDelete = (entryId: string) => {
+  const handleDeleteAPi = (entryId: string) => {
     deleteDataEntry(entryId);
-    toast({
-      title: "Entry deleted",
-      description: "Data entry has been deleted successfully.",
-    });
   };
 
   // Removed handleCopy function
@@ -109,6 +105,28 @@ export function DataEntryForm() {
   const getUserName = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user?.name || "Unknown User";
+  };
+
+  const handleDelete = async (entryId: string) => {
+    try {
+      const res = await deleteData(`delete/record/by/id/${entryId}`);
+      console.log("res: ", res);
+      if (res?.success) {
+        deleteDataEntry(entryId);
+        toast({
+          title: "Entry deleted",
+          description: "Data entry has been deleted successfully.",
+        });
+      }
+    } catch (error) {
+      console.log("error: ", error);
+      const err = error as any;
+
+      toast({
+        title: err?.message,
+        description: "Data entry has been deleted successfully.",
+      });
+    }
   };
 
   return (
@@ -157,7 +175,7 @@ export function DataEntryForm() {
               )}
             </div>
             <Badge variant="secondary" className="px-3 py-1">
-              {filteredEntries.length} results
+              {filteredEntries?.length} results
             </Badge>
           </div>
 
@@ -286,7 +304,7 @@ export function DataEntryForm() {
               </TableHeader>
 
               <TableBody>
-                {filteredEntries.length === 0 ? (
+                {filteredEntries?.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={35} className="text-center py-8">
                       <div className="text-gray-500 dark:text-gray-400">
@@ -297,9 +315,9 @@ export function DataEntryForm() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredEntries.map((entry) => (
+                  filteredEntries?.map((entry ,i) => (
                     <TableRow
-                      key={entry.id}
+                      key={i}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       {/* Actions */}
@@ -309,7 +327,7 @@ export function DataEntryForm() {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                              router.push(`/entries/${entry.id}/edit`)
+                              router.push(`/entries/${entry?.id}/edit`)
                             }
                             className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                           >
@@ -318,7 +336,7 @@ export function DataEntryForm() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDelete(entry.id)}
+                            onClick={() => handleDelete(entry?.id)}
                             className="hover:bg-red-50 hover:border-red-300 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -328,119 +346,119 @@ export function DataEntryForm() {
 
                       {/* Personal Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.record_no}
+                        {entry?.record_no}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.lead_no}
+                        {entry?.lead_no}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicant_first_name}
+                        {entry?.applicant_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicant_last_name}
+                        {entry?.applicant_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.street_address}
+                        {entry?.street_address}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.city}
+                        {entry?.city}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.zip_code}
+                        {entry?.zip_code}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.applicant_dob}
+                        {entry?.applicant_dob}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.co_applicant_first_name}
+                        {entry?.co_applicant_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.co_applicant_last_name}
+                        {entry?.co_applicant_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.best_time_to_call}
+                        {entry?.best_time_to_call}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.personal_remark}
+                        {entry?.personal_remark}
                       </TableCell>
 
                       {/* Asset Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.type_of_property}
+                        {entry?.type_of_property}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.property_value}
+                        {entry?.property_value}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.mortgage_type}
+                        {entry?.mortgage_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loan_amount}
+                        {entry?.loan_amount}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loan_term}
+                        {entry?.loan_term}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.interest_type}
+                        {entry?.interest_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.monthly_installment}
+                        {entry?.monthly_installment}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.existing_loan}
+                        {entry?.existing_loan}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.annual_income}
+                        {entry?.annual_income}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.down_payment}
+                        {entry?.down_payment}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.asset_remark}
+                        {entry?.asset_remark}
                       </TableCell>
 
                       {/* Official Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.lender_name}
+                        {entry?.lender_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loan_officer_first_name}
+                        {entry?.loan_officer_first_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.loan_officer_last_name}
+                        {entry?.loan_officer_last_name}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.tr_number}
+                        {entry?.tr_number}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.ni_number}
+                        {entry?.ni_number}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.occupation}
+                        {entry?.occupation}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.other_income}
+                        {entry?.other_income}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.credit_card_type}
+                        {entry?.credit_card_type}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.credit_score}
+                        {entry?.credit_score}
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {entry.official_remark}
+                        {entry?.official_remark}
                       </TableCell>
 
                       {/* Created By and Timestamp */}
                       {currentUser?.role !== "user" && (
                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                           <Badge variant="outline">
-                            {getUserName(entry.user_id)}
+                            {getUserName(entry?.user_id)}
                           </Badge>
                         </TableCell>
                       )}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {new Date(entry.created_at).toLocaleDateString()}
+                        {new Date(entry?.created_at).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
                   ))
@@ -453,5 +471,3 @@ export function DataEntryForm() {
     </div>
   );
 }
-
-

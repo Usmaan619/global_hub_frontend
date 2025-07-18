@@ -59,7 +59,7 @@ export function UserOverview() {
                 {myUsers.map((user) => {
                   const userEntries = getDataEntriesByUser(user.id)
                   const lastEntry = userEntries.sort(
-                    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+                    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
                   )[0]
 
                   return (
@@ -67,7 +67,7 @@ export function UserOverview() {
                       <TableCell>
                         <div>
                           <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                          <p className="text-sm text-muted-foreground">{user.userName}</p>
                           <p className="text-xs text-muted-foreground">
                             Joined {new Date(user.createdAt).toLocaleDateString()}
                           </p>
@@ -85,7 +85,7 @@ export function UserOverview() {
                           <div>
                             <p className="text-sm font-medium truncate max-w-32">{lastEntry.title}</p>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(lastEntry.createdAt).toLocaleDateString()}
+                              {new Date(lastEntry.created_at).toLocaleDateString()}
                             </p>
                           </div>
                         ) : (
@@ -145,12 +145,12 @@ export function UserOverview() {
                         <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                           <span className="flex items-center">
                             <Calendar className="h-3 w-3 mr-1" />
-                            Created: {new Date(entry.createdAt).toLocaleDateString()}
+                            Created: {new Date(entry.created_at).toLocaleDateString()}
                           </span>
-                          {entry.updatedAt !== entry.createdAt && (
+                          {entry.updated_at !== entry.created_at && (
                             <span className="flex items-center">
                               <Calendar className="h-3 w-3 mr-1" />
-                              Updated: {new Date(entry.updatedAt).toLocaleDateString()}
+                              Updated: {new Date(entry.updated_at).toLocaleDateString()}
                             </span>
                           )}
                         </div>

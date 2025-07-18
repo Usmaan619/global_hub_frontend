@@ -1,4 +1,5 @@
-import { getData, postData } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
+import { deleteData, getData, postData, updateData } from "@/services/api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -74,13 +75,14 @@ interface AuthState {
   createDataEntry: (
     entryData: Omit<DataEntry, "id" | "createdAt" | "updatedAt">
   ) => void;
-  updateDataEntry: (id: string, entryData: Partial<DataEntry>) => void;
+  // updateDataEntry: (id: string, entryData: Partial<DataEntry>) => void;
   deleteDataEntry: (id: string) => void;
 
   getUsersByAdmin: (adminId: string) => User[];
   getDataEntriesByUser: (userId: string) => DataEntry[];
 
   fetchDataEntries: () => Promise<void>;
+  updateDataEntry: (id: string, entryData: Partial<DataEntry>) => Promise<void>;
 }
 
 // ---------- Store Setup ----------
@@ -214,14 +216,48 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      updateDataEntry: (id, entryData) => {
-        set((state) => ({
-          dataEntries: state.dataEntries.map((entry) =>
-            entry.id === id
-              ? { ...entry, ...entryData, updatedAt: new Date().toISOString() }
-              : entry
-          ),
-        }));
+      // updateDataEntrya: (id, entryData) => {
+      //   set((state) => ({
+      //     dataEntries: state.dataEntries.map((entry) =>
+      //       entry.id === id
+      //         ? { ...entry, ...entryData, updatedAt: new Date().toISOString() }
+      //         : entry
+      //     ),
+      //   }));
+      //   // update/record/by/id/:id
+      // },
+
+      updateDataEntry: async (id, entryData) => {
+        try {
+          const res = await postData(`update/record/by/id/${id}`, entryData);
+
+          console.log("Fetched entries: ", res?.record);
+          if (res?.result) {
+            toast({
+              title: "Entry updated",
+              description: "Data entry has been updated successfully.",
+            });
+
+            set((state) => ({
+              dataEntries: state.dataEntries.map((entry) =>
+                entry.id === id
+                  ? {
+                      ...entry,
+                      ...entryData,
+                      updated_at: new Date().toISOString(),
+                    }
+                  : entry
+              ),
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to update data entry:", error);
+          toast({
+            title: "Update failed",
+            description: "Server did not return updated record.",
+            variant: "destructive",
+          });
+        }
       },
 
       deleteDataEntry: (id) => {
@@ -231,7 +267,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       getUsersByAdmin: (adminId: string) => {
-        console.log('adminId: ', adminId);
+        console.log("adminId: ", adminId);
         return get().users.filter((user) => user.createdBy === adminId);
       },
 
@@ -259,15 +295,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-function camelToSnake(obj: any) {
-  const newObj = {};
-  for (let key in obj) {
-    const snakeKey = key.replace(
-      /[A-Z]/g,
-      (letter) => `_${letter.toLowerCase()}`
-    );
-    newObj[snakeKey] = obj[key];
-  }
-  return newObj;
-}

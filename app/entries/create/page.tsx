@@ -75,7 +75,7 @@ export default function CreateEntryPage() {
 
     createDataEntry({
       ...formData,
-      userId: currentUser.id,
+      user_id: currentUser.id,
     })
     toast({
       title: "Entry created",

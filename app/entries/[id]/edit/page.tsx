@@ -22,44 +22,10 @@ export default function EditEntryPage() {
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
   const params = useParams();
+  
   const entryId = params.id as string;
 
   const [formData, setFormData] = useState<FormData>({
-    // recordNo: "",
-    // leadNo: "",
-    // applicantFirstName: "",
-    // applicantLastName: "",
-    // streetAddress: "",
-    // city: "",
-    // zipCode: "",
-    // applicantDob: "",
-    // coApplicantFirstName: "",
-    // coApplicantLastName: "",
-    // bestTimeToCall: "",
-    // personalRemark: "",
-    // typeOfProperty: "",
-    // propertyValue: "",
-    // mortgageType: "",
-    // loanAmount: "",
-    // loanTerm: "",
-    // interestType: "",
-    // monthlyInstallment: "",
-    // existingLoan: "",
-    // annualIncome: "",
-    // downPayment: "",
-    // assetRemark: "",
-    // lenderName: "",
-    // loanOfficerFirstName: "",
-    // loanOfficerLastName: "",
-    // trNumber: "",
-    // niNumber: "",
-    // occupation: "",
-    // otherIncome: "",
-    // creditCardType: "",
-    // creditScore: "",
-    // officialRemark: "",
-    // image: "",
-
     image: "",
     admin_id: "",
     record_no: "",
@@ -102,12 +68,15 @@ export default function EditEntryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log('entryId: ', entryId);
-    console.log('dataEntries: ', dataEntries);
+    
+    
     if (entryId) {
-      const entryToEdit = dataEntries.find((entry) => entry.id == (entryId));
-      console.log('entryToEdit: ', entryToEdit);
+      const entryToEdit = dataEntries.find(
+        (entry) => parseInt(entry.id) === parseInt(entryId)
+      );
       if (entryToEdit) {
+        console.log('entryToEdit:======= ', entryToEdit);
+        
         // Destructure to exclude id, userId, createdAt, updatedAt
         const { id, user_id, created_at, updated_at, ...rest } = entryToEdit;
         setFormData(rest);
@@ -138,11 +107,13 @@ export default function EditEntryPage() {
       return;
     }
 
+    
     updateDataEntry(entryId, formData);
-    toast({
-      title: "Entry updated",
-      description: "Data entry has been updated successfully.",
-    });
+    
+    // toast({
+    //   title: "Entry updated",
+    //   description: "Data entry has been updated successfully.",
+    // });
     router.push("/entries"); // Redirect back to entries list
   };
 
@@ -193,12 +164,12 @@ export default function EditEntryPage() {
                 setSelectedImage={setSelectedImage}
                 fileInputRef={fileInputRef}
               />
-              <Button
+              {/* <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
               >
                 Update Entry
-              </Button>
+              </Button> */}
             </form>
           </div>
         </main>

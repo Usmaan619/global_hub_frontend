@@ -74,7 +74,7 @@ export function Dashboard() {
     } else if (currentUser?.role === "admin") {
       const adminUsers = getUsersByAdmin(currentUser.id)
       const userIds = [currentUser.id, ...adminUsers.map((u) => u.id)]
-      entriesToExport = dataEntries.filter((entry) => userIds.includes(entry.userId))
+      entriesToExport = dataEntries.filter((entry) => userIds.includes(entry.user_id))
     } else {
       entriesToExport = getDataEntriesByUser(currentUser?.id || "")
     }
@@ -83,9 +83,9 @@ export function Dashboard() {
       id: entry.id,
       title: entry.title,
       description: entry.description,
-      userId: entry.userId,
-      createdAt: entry.createdAt,
-      updatedAt: entry.updatedAt,
+      userId: entry.user_id,
+      createdAt: entry.created_at,
+      updatedAt: entry.updated_at,
     }))
 
     generateCSV(exportData, "data_entries_export.csv")
@@ -101,12 +101,12 @@ export function Dashboard() {
     } else if (currentUser?.role === "admin") {
       allUsers = getUsersByAdmin(currentUser.id)
       const userIds = [currentUser.id, ...allUsers.map((u) => u.id)]
-      allEntries = dataEntries.filter((entry) => userIds.includes(entry.userId))
+      allEntries = dataEntries.filter((entry) => userIds.includes(entry.user_id))
     }
 
     // Combine users and their data entries
     const combinedData = allUsers.map((user) => {
-      const userEntries = allEntries.filter((entry) => entry.userId === user.id)
+      const userEntries = allEntries.filter((entry) => entry.user_id === user.id)
       return {
         userId: user.id,
         userName: user.name,
@@ -133,7 +133,7 @@ export function Dashboard() {
     } else if (currentUser?.role === "admin") {
       const myUsers = getUsersByAdmin(currentUser.id)
       const userIds = [currentUser.id, ...myUsers.map((u) => u.id)]
-      const myEntries = dataEntries.filter((entry) => userIds.includes(entry.userId))
+      const myEntries = dataEntries.filter((entry) => userIds.includes(entry.user_id))
       return {
         admins: 0,
         users: myUsers.length,
@@ -166,7 +166,7 @@ export function Dashboard() {
     }
 
     userEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt)
+      const entryDate = new Date(entry.created_at)
       const key = entryDate.toLocaleDateString("en-US", { month: "short" })
       if (data.hasOwnProperty(key)) {
         data[key]++

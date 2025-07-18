@@ -34,9 +34,9 @@ export const updateData = async (endpoint: string, data: any, config = {}) => {
 };
 
 // DELETE
-export const deleteData = async (endpoint: string, config = {}) => {
+export const deleteData = async (endpoint: string) => {
   try {
-    const response = await axiosInstance.delete(endpoint, config);
+    const response = await axiosInstance.delete(endpoint);
     return response.data;
   } catch (error) {
     handleError(error);

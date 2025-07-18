@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react"; // Removed Copy icon
 import { toast } from "@/hooks/use-toast";
 import type { DataEntry } from "@/stores/auth-store"; // Import DataEntry type
-import { postData } from "@/services/api";
+import { useParams } from "next/navigation";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
 type FormData = Omit<DataEntry, "id" | "user_id" | "created_at" | "updated_at">;
@@ -28,10 +28,14 @@ export function DataEntryFormFields({
   setSelectedImage,
   fileInputRef,
 }: DataEntryFormFieldsProps) {
-  console.log("formData: ", formData);
+  const params = useParams();
+  
+  const entryId = params.id as string;
 
+  
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       const reader = new FileReader();
       const img = new Image();
@@ -92,11 +96,8 @@ export function DataEntryFormFields({
     setFormData((prev) => ({ ...prev, [id]: value }));
 
     try {
-      console.log("formData: ", formData);
-
       return { success: true };
     } catch (error) {
-      console.error("Create data entry error:", error);
       return { success: false };
     }
   };
@@ -160,12 +161,12 @@ export function DataEntryFormFields({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="recordNo">
+                <Label htmlFor="record_no">
                   Record No <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="recordNo"
+                id="record_no"
                 value={formData.record_no}
                 onChange={handleChange}
                 required
@@ -173,12 +174,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="leadNo">
+                <Label htmlFor="lead_no">
                   Lead No <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="leadNo"
+                id="lead_no"
                 value={formData.lead_no}
                 onChange={handleChange}
                 required
@@ -186,12 +187,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="applicantFirstName">
+                <Label htmlFor="applicant_first_name">
                   Applicant First Name <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="applicantFirstName"
+                id="applicant_first_name"
                 value={formData.applicant_first_name}
                 onChange={handleChange}
                 required
@@ -199,12 +200,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="applicantLastName">
+                <Label htmlFor="applicant_last_name">
                   Applicant Last Name <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="applicantLastName"
+                id="applicant_last_name"
                 value={formData.applicant_last_name}
                 onChange={handleChange}
                 required
@@ -212,12 +213,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 col-span-full ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="streetAddress">
+                <Label htmlFor="street_address">
                   Street Address <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="streetAddress"
+                id="street_address"
                 value={formData.street_address}
                 onChange={handleChange}
                 required
@@ -238,12 +239,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="zipCode">
+                <Label htmlFor="zip_code">
                   Zip Code <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="zipCode"
+                id="zip_code"
                 value={formData.zip_code}
                 onChange={handleChange}
                 required
@@ -251,12 +252,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="applicantDob">
+                <Label htmlFor="applicant_dob">
                   Applicant DOB <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="applicantDob"
+                id="applicant_dob"
                 type="text"
                 value={formData.applicant_dob}
                 onChange={handleChange}
@@ -265,13 +266,13 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ">
               <div className="flex items-center justify-between">
-                <Label htmlFor="coApplicantFirstName">
+                <Label htmlFor="co_applicant_first_name">
                   Co-Applicant First Name{" "}
                   <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="coApplicantFirstName"
+                id="co_applicant_first_name"
                 value={formData.co_applicant_first_name}
                 onChange={handleChange}
                 required
@@ -279,12 +280,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="coApplicantLastName">
+                <Label htmlFor="co_applicant_last_name">
                   Co-Applicant Last Name <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="coApplicantLastName"
+                id="co_applicant_last_name"
                 value={formData.co_applicant_last_name}
                 onChange={handleChange}
                 required
@@ -292,12 +293,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="bestTimeToCall">
+                <Label htmlFor="best_time_to_call">
                   Best Time to Call <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="bestTimeToCall"
+                id="best_time_to_call"
                 type="Text"
                 value={formData.best_time_to_call}
                 onChange={handleChange}
@@ -306,12 +307,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 col-span-full ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="personalRemark">
+                <Label htmlFor="personal_remark">
                   Remark <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Textarea
-                id="personalRemark"
+                id="personal_remark"
                 value={formData.personal_remark}
                 onChange={handleChange}
                 rows={3}
@@ -328,12 +329,12 @@ export function DataEntryFormFields({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="typeOfProperty">
+                <Label htmlFor="type_of_property">
                   Type of Property <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="typeOfProperty"
+                id="type_of_property"
                 value={formData.type_of_property}
                 onChange={handleChange}
                 required
@@ -341,12 +342,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="propertyValue">
+                <Label htmlFor="property_value">
                   Property Value <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="propertyValue"
+                id="property_value"
                 type="text"
                 value={formData.property_value}
                 onChange={handleChange}
@@ -355,12 +356,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="mortgageType">
+                <Label htmlFor="mortgage_type">
                   Mortgage Type <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="mortgageType"
+                id="mortgage_type"
                 value={formData.mortgage_type}
                 onChange={handleChange}
                 required
@@ -368,12 +369,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ">
               <div className="flex items-center justify-between">
-                <Label htmlFor="loanAmount">
+                <Label htmlFor="loan_amount">
                   Loan Amount <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="loanAmount"
+                id="loan_amount"
                 type="text"
                 value={formData.loan_amount}
                 onChange={handleChange}
@@ -382,12 +383,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="loanTerm">
+                <Label htmlFor="loan_term">
                   Loan Term <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="loanTerm"
+                id="loan_term"
                 value={formData.loan_term}
                 onChange={handleChange}
                 required
@@ -395,12 +396,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="interestType">
+                <Label htmlFor="interest_type">
                   Interest Type <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="interestType"
+                id="interest_type"
                 value={formData.interest_type}
                 onChange={handleChange}
                 required
@@ -408,12 +409,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="monthlyInstallment">
+                <Label htmlFor="monthly_installment">
                   Monthly Installment <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="monthlyInstallment"
+                id="monthly_installment"
                 type="text"
                 value={formData.monthly_installment}
                 onChange={handleChange}
@@ -422,12 +423,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="existingLoan">
+                <Label htmlFor="existing_loan">
                   Existing Loan <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="existingLoan"
+                id="existing_loan"
                 value={formData.existing_loan}
                 onChange={handleChange}
                 required
@@ -435,12 +436,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="annualIncome">
+                <Label htmlFor="annual_income">
                   Annual Income <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="annualIncome"
+                id="annual_income"
                 type="text"
                 value={formData.annual_income}
                 onChange={handleChange}
@@ -449,12 +450,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="downPayment">
+                <Label htmlFor="down_payment">
                   Down Payment <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="downPayment"
+                id="down_payment"
                 type="text"
                 value={formData.down_payment}
                 onChange={handleChange}
@@ -463,12 +464,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 col-span-full ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="assetRemark">
+                <Label htmlFor="asset_remark">
                   Remark <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Textarea
-                id="assetRemark"
+                id="asset_remark"
                 value={formData.asset_remark}
                 onChange={handleChange}
                 rows={3}
@@ -485,12 +486,12 @@ export function DataEntryFormFields({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="lenderName">
+                <Label htmlFor="lender_name">
                   Lender Name <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="lenderName"
+                id="lender_name"
                 value={formData.lender_name}
                 onChange={handleChange}
                 required
@@ -498,13 +499,13 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="loanOfficerFirstName">
+                <Label htmlFor="loan_officer_first_name">
                   Loan Officer First Name{" "}
                   <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="loanOfficerFirstName"
+                id="loan_officer_first_name"
                 value={formData.loan_officer_first_name}
                 onChange={handleChange}
                 required
@@ -512,12 +513,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="loanOfficerLastName">
+                <Label htmlFor="loan_officer_last_name">
                   Loan Officer Last Name <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="loanOfficerLastName"
+                id="loan_officer_last_name"
                 value={formData.loan_officer_last_name}
                 onChange={handleChange}
                 required
@@ -525,12 +526,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="trNumber">
+                <Label htmlFor="tr_number">
                   T.R # <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="trNumber"
+                id="tr_number"
                 value={formData.tr_number}
                 onChange={handleChange}
                 required
@@ -538,12 +539,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="niNumber">
+                <Label htmlFor="ni_number">
                   N.I # <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="niNumber"
+                id="ni_number"
                 value={formData.ni_number}
                 onChange={handleChange}
                 required
@@ -564,12 +565,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="otherIncome">
+                <Label htmlFor="other_income">
                   Other Income <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="otherIncome"
+                id="other_income"
                 type="text"
                 value={formData.other_income}
                 onChange={handleChange}
@@ -578,12 +579,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="creditCardType">
+                <Label htmlFor="credit_card_type">
                   Credit Card Type <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="creditCardType"
+                id="credit_card_type"
                 value={formData.credit_card_type}
                 onChange={handleChange}
                 required
@@ -591,12 +592,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 ps-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="creditScore">
+                <Label htmlFor="credit_score">
                   Credit Score <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
-                id="creditScore"
+                id="credit_score"
                 type="text"
                 value={formData.credit_score}
                 onChange={handleChange}
@@ -605,12 +606,12 @@ export function DataEntryFormFields({
             </div>
             <div className="space-y-2 col-span-full ps-2 mb-5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="officialRemark">
+                <Label htmlFor="official_remark">
                   Remarks <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Textarea
-                id="officialRemark"
+                id="official_remark"
                 value={formData.official_remark}
                 onChange={handleChange}
                 rows={3}
@@ -624,7 +625,7 @@ export function DataEntryFormFields({
             type="submit"
             className="w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
           >
-            Create Entry
+            {entryId ? "Save Entry" : "Create Entry"}
           </Button>
         </div>
       </div>
