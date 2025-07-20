@@ -63,12 +63,18 @@ interface AuthState {
   token: string | null;
   users: User[];
   dataEntries: DataEntry[];
+  AdminData: any;
 
   setUserAndToken: (user: User, token: string) => void;
   login: (userName: string, password: string) => boolean;
   logout: () => void;
 
-  createUser: (userData: Omit<User, "id" | "createdAt">) => boolean;
+  // createUser: (userData: Omit<User, "id" | "createdAt">) => boolean;
+  // createUser: (userData: Omit<User, "id" | "createdAt">) => Promise<boolean>;
+  createUser: (
+    userData: Omit<User, "id" | "created_at"> & { password: string }
+  ) => Promise<boolean>;
+
   updateUser: (id: string, userData: Partial<User>) => void;
   deleteUser: (id: string) => void;
 
@@ -79,11 +85,15 @@ interface AuthState {
   deleteDataEntry: (id: string) => void;
 
   getUsersByAdmin: (adminId: string) => User[];
+  getUsersByAdminApi: (adminId: string) => Promise<any>;
+
   getDataEntriesByUser: (userId: string) => DataEntry[];
 
   fetchDataEntries: () => Promise<void>;
   updateDataEntry: (id: string, entryData: Partial<DataEntry>) => Promise<void>;
+  fetchAdminAndUser: () => Promise<void>;
 }
+
 
 // ---------- Store Setup ----------
 
@@ -104,6 +114,7 @@ export const useAuthStore = create<AuthState>()(
       ],
 
       dataEntries: [],
+      AdminData: null, // ✅ <--- Add this line
 
       setUserAndToken: (user, token) => set({ currentUser: user, token }),
 
@@ -120,30 +131,121 @@ export const useAuthStore = create<AuthState>()(
         set({ currentUser: null, token: null });
       },
 
-      createUser: (userData) => {
-        const { currentUser, users } = get();
-        if (!currentUser) return false;
+      // createUser: (userData) => {
+      //   const { currentUser, users } = get();
+      //   if (!currentUser) return false;
 
+      //   if (currentUser.role === "superadmin") {
+      //     // Allowed
+      //   } else if (currentUser.role === "admin" && userData.role === "user") {
+      //     const adminUsers = users.filter(
+      //       (u) => u.createdBy === currentUser.id
+      //     );
+      //     if (adminUsers.length >= 5) return false;
+      //   } else {
+      //     return false;
+      //   }
+
+      //   const newUser: User = {
+      //     ...userData,
+      //     id: Date.now().toString(),
+      //     createdBy: currentUser.id,
+      //     createdAt: new Date().toISOString(),
+      //   };
+
+      //   set({ users: [...users, newUser] });
+      //   return true;
+      // },
+
+      createUser: async (userData) => {
+        const { currentUser, users } = get();
+        if (!currentUser) {
+          toast({
+            title: "Authentication required",
+            description: "You must be logged in to create users.",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        // Authorization
         if (currentUser.role === "superadmin") {
-          // Allowed
+          // allowed
         } else if (currentUser.role === "admin" && userData.role === "user") {
           const adminUsers = users.filter(
             (u) => u.createdBy === currentUser.id
           );
-          if (adminUsers.length >= 5) return false;
+          if (adminUsers.length >= 5) {
+            toast({
+              title: "Limit reached",
+              description: "Admins can only create up to 5 users.",
+              variant: "destructive",
+            });
+            return false;
+          }
         } else {
+          toast({
+            title: "Permission denied",
+            description: "You are not authorized to create this type of user.",
+            variant: "destructive",
+          });
           return false;
         }
-
-        const newUser: User = {
-          ...userData,
-          id: Date.now().toString(),
-          createdBy: currentUser.id,
-          createdAt: new Date().toISOString(),
+        console.log("userData: ", userData);
+        const payload = {
+          name: userData.name,
+          username: userData.userName,
+          password: userData.password,
+          role: userData.role,
+          created_by: currentUser?.role,
+          admin_id:
+            currentUser?.role === "superadmin"
+              ? currentUser?.id
+              : currentUser?.id,
+          user_limit: userData.user_limit,
         };
 
-        set({ users: [...users, newUser] });
-        return true;
+        try {
+          const response = await postData("/auth/register", payload);
+          console.log("response: ", response);
+
+          if (response?.success) {
+            toast({
+              title: "User created",
+              description: `User "${userData.name}" was created successfully.`,
+            });
+            return true;
+          } else {
+            return false;
+          }
+
+          // if (response?.success) {
+          //   const newUser: User = response.user;
+          //   set({ users: [...users, newUser] });
+
+          //   toast({
+          //     title: "User created",
+          //     description: `User "${newUser.name}" was created successfully.`,
+          //   });
+
+          //   return true;
+          // } else {
+          //   toast({
+          //     title: "Error",
+          //     description: "User creation failed. No user returned from API.",
+          //     variant: "destructive",
+          //   });
+          //   return false;
+          // }
+        } catch (error) {
+          console.error("Create user API error:", error);
+          toast({
+            title: "Server Error",
+            description: "Failed to create user due to server error.",
+            variant: "destructive",
+          });
+          return false;
+        }
       },
 
       updateUser: (id, userData) => {
@@ -265,10 +367,44 @@ export const useAuthStore = create<AuthState>()(
           dataEntries: state.dataEntries.filter((entry) => entry.id !== id),
         }));
       },
-
       getUsersByAdmin: (adminId: string) => {
         console.log("adminId: ", adminId);
-        return get().users.filter((user) => user.createdBy === adminId);
+        return get().users.filter((user) => user?.createdBy === adminId);
+      },
+
+      getUsersByAdminApi: async (adminId: string) => {
+        console.log("adminId: ", adminId);
+        await get().fetchAdminAndUser(); // Await to ensure users are fetched before filtering
+        return get().users.filter((user) => user?.createdBy === adminId);
+      },
+
+      fetchAdminAndUser: async () => {
+        const { currentUser } = get();
+
+        if (!currentUser) return;
+
+        try {
+          let res;
+
+          if (currentUser.role === "superadmin") {
+            res = await getData(
+              `get/admin/user/by/role/id?role=${currentUser.role}`
+            );
+          } else if (currentUser.role === "admin") {
+            res = await getData(
+              `get/admin/user/by/role/id?role=${currentUser.role}&id=${currentUser.id}`
+            );
+          }
+
+          console.log("Fetched entries:======= ", res);
+
+          //  Set fetched users into state
+          if (res?.success && res?.user) {
+            set({ AdminData: res.user?.data });
+          }
+        } catch (error) {
+          console.error("Failed to fetch data entries:", error);
+        }
       },
 
       getDataEntriesByUser: (userId: string) => {
@@ -276,7 +412,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchDataEntries: async () => {
-        const { currentUser, dataEntries } = get();
+        const { currentUser } = get();
         if (!currentUser || currentUser.role !== "superadmin") return;
 
         try {

@@ -61,21 +61,22 @@ export function SuperAdminDashboard() {
   const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
   const [viewAdminDetails, setViewAdminDetails] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-
+  
   if (!currentUser || currentUser.role !== "superadmin") {
     return null;
   }
+  console.log('users: ', users);
 
-  const admins = users.filter((u) => u.role === "admin");
-  const allUsers = users.filter((u) => u.role === "user");
+  const admins = users?.filter((u) => u?.role === "admin");
+  const allUsers = users?.filter((u) => u?.role === "user");
   const totalEntries = dataEntries.length;
 
   // Calculate admin statistics
-  const adminStats = admins.map((admin) => {
+  const adminStats = admins?.map((admin) => {
     const adminUsers = getUsersByAdmin(admin.id);
-    const adminUserIds = adminUsers.map((u) => u.id);
-    const adminEntries = dataEntries.filter((entry) =>
-      adminUserIds.includes(entry.userId)
+    const adminUserIds = adminUsers?.map((u) => u.id);
+    const adminEntries = dataEntries?.filter((entry) =>
+      adminUserIds.includes(entry.user_id)
     );
 
     return {
@@ -99,7 +100,7 @@ export function SuperAdminDashboard() {
     }
 
     dataEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt);
+      const entryDate = new Date(entry?.created_at);
       const key = entryDate.toLocaleDateString("en-US", { month: "short" });
       if (data.hasOwnProperty(key)) {
         data[key]++;
@@ -143,7 +144,7 @@ export function SuperAdminDashboard() {
     }
 
     dataEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt);
+      const entryDate = new Date(entry?.created_at);
       const key = entryDate.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -165,7 +166,7 @@ export function SuperAdminDashboard() {
   const recentEntries = dataEntries
     .sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime()
     )
     .slice(0, 5);
 
@@ -207,7 +208,7 @@ export function SuperAdminDashboard() {
     }
 
     dataEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt);
+      const entryDate = new Date(entry?.created_at);
       if (
         entryDate.getMonth() === currentMonth &&
         entryDate.getFullYear() === currentYear
@@ -567,10 +568,10 @@ export function SuperAdminDashboard() {
           </CardContent>
         </Card> */}
       </div>
-     <div className="space-y-6">
-            <UserManagement />
-            <UserOverview />
-          </div>
+      <div className="space-y-6">
+        <UserManagement />
+        <UserOverview />
+      </div>
       {/* Admin Details Dialog */}
       <Dialog open={viewAdminDetails} onOpenChange={setViewAdminDetails}>
         <DialogContent className="max-w-4xl">
@@ -638,21 +639,21 @@ export function SuperAdminDashboard() {
                   <TableBody>
                     {selectedAdmin.users.map((user: any) => {
                       const userEntries = selectedAdmin.entries.filter(
-                        (e: any) => e.userId === user.id
+                        (e: any) => e.user_id === user.id
                       );
                       return (
-                        <TableRow key={user.id}>
+                        <TableRow key={user?.id}>
                           <TableCell className="font-medium">
-                            {user.name}
+                            {user?.name}
                           </TableCell>
-                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user?.email}</TableCell>
                           <TableCell>
                             <Badge variant="secondary">
                               {userEntries.length}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {new Date(user?.created_at).toLocaleDateString()}
                           </TableCell>
                         </TableRow>
                       );

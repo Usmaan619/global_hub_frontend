@@ -1,21 +1,32 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { useAuthStore } from "@/stores/auth-store"
-import { useThemeStore } from "@/stores/theme-store"
-import { LayoutDashboard, Users, FileText, LogOut, Settings, Moon, Sun, ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/auth-store";
+import { useThemeStore } from "@/stores/theme-store";
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  LogOut,
+  Settings,
+  Moon,
+  Sun,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Sidebar() {
-  const { currentUser, logout } = useAuthStore()
-  const { theme, sidebarCollapsed, toggleTheme, toggleSidebar } = useThemeStore()
-  const router = useRouter()
+  const { currentUser, logout } = useAuthStore();
+  const { theme, sidebarCollapsed, toggleTheme, toggleSidebar } =
+    useThemeStore();
+  const router = useRouter();
 
   const handleLogout = () => {
-    logout()
-    router.push("/")
-  }
+    logout();
+    router.push("/");
+  };
 
   const menuItems = [
     {
@@ -30,27 +41,37 @@ export function Sidebar() {
       href: "/users",
       roles: ["superadmin", "admin"],
     },
+
+      {
+      icon: FileText,
+      label: "Add Entry",
+      href: "/entries/create",
+      roles: ["superadmin", "admin", "user"],
+    },
     {
       icon: FileText,
-      label: "Data Entries",
+      label: "Entry List",
       href: "/entries",
       roles: ["superadmin", "admin", "user"],
     },
+
     {
       icon: Settings,
       label: "Settings",
       href: "",
       roles: ["superadmin", "admin"],
     },
-  ]
+  ];
 
-  const filteredMenuItems = menuItems.filter((item) => item.roles.includes(currentUser?.role || ""))
+  const filteredMenuItems = menuItems.filter((item) =>
+    item.roles.includes(currentUser?.role || "")
+  );
 
   return (
     <div
       className={cn(
         "bg-gradient-to-b from-blue-900 to-blue-800 dark:from-gray-900 dark:to-gray-800 text-white h-screen flex flex-col shadow-xl transition-all duration-300 ease-in-out",
-        sidebarCollapsed ? "w-16" : "w-64",
+        sidebarCollapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header with Logo and Toggle */}
@@ -58,7 +79,11 @@ export function Sidebar() {
         <div className="flex items-center justify-between">
           {!sidebarCollapsed && (
             <div className="flex items-center space-x-3 mb-3">
-              <img src="/images/logo.png" alt="Global Hub" className="h-8 w-auto brightness-0 invert" />
+              <img
+                src="/images/logo.png"
+                alt="Global Hub"
+                className="h-8 w-auto brightness-0 invert"
+              />
             </div>
           )}
           <Button
@@ -67,7 +92,11 @@ export function Sidebar() {
             onClick={toggleSidebar}
             className="text-white hover:bg-blue-700 dark:hover:bg-gray-700 ml-auto"
           >
-            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {sidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
           </Button>
         </div>
 
@@ -90,12 +119,14 @@ export function Sidebar() {
                 variant="ghost"
                 className={cn(
                   "w-full text-white hover:bg-blue-700 dark:hover:bg-gray-700 hover:text-white transition-all duration-200",
-                  sidebarCollapsed ? "justify-center px-2" : "justify-start",
+                  sidebarCollapsed ? "justify-center px-2" : "justify-start"
                 )}
                 onClick={() => router.push(item.href)}
                 title={sidebarCollapsed ? item.label : undefined}
               >
-                <item.icon className={cn("h-4 w-4", !sidebarCollapsed && "mr-3")} />
+                <item.icon
+                  className={cn("h-4 w-4", !sidebarCollapsed && "mr-3")}
+                />
                 {!sidebarCollapsed && <span>{item.label}</span>}
               </Button>
             </li>
@@ -109,7 +140,7 @@ export function Sidebar() {
           variant="ghost"
           className={cn(
             "w-full text-white hover:bg-blue-700 dark:hover:bg-gray-700 hover:text-white transition-all duration-200",
-            sidebarCollapsed ? "justify-center px-2" : "justify-start",
+            sidebarCollapsed ? "justify-center px-2" : "justify-start"
           )}
           onClick={toggleTheme}
           title={sidebarCollapsed ? "Toggle Theme" : undefined}
@@ -119,14 +150,16 @@ export function Sidebar() {
           ) : (
             <Sun className={cn("h-4 w-4", !sidebarCollapsed && "mr-3")} />
           )}
-          {!sidebarCollapsed && <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>}
+          {!sidebarCollapsed && (
+            <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+          )}
         </Button>
 
         <Button
           variant="ghost"
           className={cn(
             "w-full text-white hover:bg-red-600 hover:text-white transition-all duration-200",
-            sidebarCollapsed ? "justify-center px-2" : "justify-start",
+            sidebarCollapsed ? "justify-center px-2" : "justify-start"
           )}
           onClick={handleLogout}
           title={sidebarCollapsed ? "Sign Out" : undefined}
@@ -137,10 +170,12 @@ export function Sidebar() {
 
         {!sidebarCollapsed && (
           <div className="mt-3 pt-3 border-t border-blue-700 dark:border-gray-700">
-            <p className="text-xs text-blue-200 dark:text-gray-300 text-center">© 2024 Global Hub</p>
+            <p className="text-xs text-blue-200 dark:text-gray-300 text-center">
+              © 2024 Global Hub
+            </p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

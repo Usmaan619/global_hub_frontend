@@ -143,13 +143,13 @@ export function DataEntryForm() {
                 Manage your data entries ({filteredEntries.length} entries)
               </CardDescription>
             </div>
-            <Button
+            {/* <Button
               onClick={() => router.push("/entries/create")}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Entry
-            </Button>
+            </Button> */}
           </div>
         </CardHeader>
         <CardContent>

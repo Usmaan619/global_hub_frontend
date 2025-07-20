@@ -27,12 +27,12 @@ export function DataEntryFormFields({
   selectedImage,
   setSelectedImage,
   fileInputRef,
+  handleReset,
 }: DataEntryFormFieldsProps) {
   const params = useParams();
-  
+
   const entryId = params.id as string;
 
-  
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -627,6 +627,14 @@ export function DataEntryFormFields({
           >
             {entryId ? "Save Entry" : "Create Entry"}
           </Button>
+          {/* {!entryId && (
+            <Button
+              onClick={handleReset()}
+              className="ms-3 w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+            >
+              Reset
+            </Button>
+          )} */}
         </div>
       </div>
     </div>
