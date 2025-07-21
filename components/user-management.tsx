@@ -39,8 +39,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
-import { deleteData, postData } from "@/services/api";
+import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
+import { deleteData, getData, postData } from "@/services/api";
+import axios from "axios";
 
 export function UserManagement() {
   const {
@@ -134,6 +135,7 @@ export function UserManagement() {
           variant: "destructive",
         });
       }
+      await getDataAPi();
     }
 
     setFormData({
@@ -176,7 +178,7 @@ export function UserManagement() {
     try {
       // /delete/admin/user/by/id/:id
       const res = await deleteData(`/delete/admin/user/by/id/${userId}`);
-      console.log('res: ', res);
+      console.log("res: ", res);
 
       if (res?.success) {
         toast({
@@ -207,6 +209,36 @@ export function UserManagement() {
     }
   };
   const [viewUser, setViewUser] = useState<any>(null);
+
+  const handleDonwloadCSV = async (u: any) => {
+    console.log("u:handleDonwloadCSV ", u);
+    try {
+      const response = await axios.get(
+        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
+        {
+          responseType: "blob", // 👈 VERY important
+        }
+      );
+
+      // Create a blob from the response
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      // Create download link
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `user_${u?.id}_records.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Failed to download Excel file.");
+    }
+  };
 
   return (
     <Card>
@@ -339,6 +371,9 @@ export function UserManagement() {
               <TableHead className="text-center">Username</TableHead>
               <TableHead className="text-center">password</TableHead>
               <TableHead className="text-center">User Create Limit</TableHead>
+              <TableHead className="text-center">
+                Total Entrires Created By Users
+              </TableHead>
               <TableHead className="text-center">Role Name</TableHead>
               <TableHead className="text-center">User Count</TableHead>
               <TableHead className="text-center">Created Date</TableHead>
@@ -360,7 +395,9 @@ export function UserManagement() {
                   <TableCell className="text-center">
                     {user?.user_limit}
                   </TableCell>
-
+                  <TableCell className="text-center">
+                    {user?.total_records_created_by_users}
+                  </TableCell>
                   <TableCell className="text-center">
                     {user?.role_name}
                   </TableCell>
@@ -408,7 +445,7 @@ export function UserManagement() {
         </Table>
         {viewUser && (
           <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
-            <DialogContent className="max-w-5xl">
+            <DialogContent className="max-w-7xl">
               <DialogHeader>
                 <DialogTitle>Admin & Users Details</DialogTitle>
                 <DialogDescription>Complete information</DialogDescription>
@@ -425,6 +462,10 @@ export function UserManagement() {
                       <TableHead className="text-center">Password</TableHead>
                       <TableHead className="text-center">Role</TableHead>
                       <TableHead className="text-center">User Limit</TableHead>
+                      <TableHead className="text-center">
+                        Total Entrires Created By Users
+                      </TableHead>
+
                       <TableHead className="text-center">User Count</TableHead>
                       <TableHead className="text-center">Created At</TableHead>
                     </TableRow>
@@ -445,6 +486,9 @@ export function UserManagement() {
                       </TableCell>
                       <TableCell className="text-center">
                         {viewUser.user_limit || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {viewUser?.total_records_created_by_users}
                       </TableCell>
                       <TableCell className="text-center">
                         {viewUser.user_count}
@@ -474,7 +518,14 @@ export function UserManagement() {
                         <TableHead className="text-center">Password</TableHead>
                         <TableHead className="text-center">Role</TableHead>
                         <TableHead className="text-center">
+                          User Entrires Count
+                        </TableHead>
+                        <TableHead className="text-center">
                           Created At
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          Download Excel
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -495,7 +546,19 @@ export function UserManagement() {
                             {u.role}
                           </TableCell>
                           <TableCell className="text-center">
+                            {u.record_count}
+                          </TableCell>
+                          <TableCell className="text-center">
                             {new Date(u.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDonwloadCSV(u)}
+                            >
+                              <FileDown color="green" size={23} />
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}

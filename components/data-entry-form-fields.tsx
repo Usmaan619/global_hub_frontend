@@ -27,7 +27,6 @@ export function DataEntryFormFields({
   selectedImage,
   setSelectedImage,
   fileInputRef,
-  handleReset,
 }: DataEntryFormFieldsProps) {
   const params = useParams();
 
@@ -47,10 +46,10 @@ export function DataEntryFormFields({
           const imageUrl = e.target?.result as string;
           setFormData((prev) => ({ ...prev, image: imageUrl }));
           setSelectedImage(imageUrl);
-          toast({
-            title: "Image uploaded",
-            description: "Image dimensions are valid (765x850).",
-          });
+          // toast({
+          //   title: "Image uploaded",
+          //   description: "Image dimensions are valid (765x850).",
+          // });
         };
         reader.readAsDataURL(file);
         // } else {

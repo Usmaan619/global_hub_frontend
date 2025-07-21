@@ -48,49 +48,57 @@ export function DataEntryForm() {
   }, [currentUser?.role]);
 
   // Enhanced search functionality
-  const filteredEntries = useMemo(() => {
-    if (!searchTerm.trim()) return userEntries;
+  // const filteredEntries = useMemo(() => {
+  //   if (!searchTerm.trim()) return userEntries;
 
-    const searchLower = searchTerm.toLowerCase();
-    return userEntries.filter((entry) => {
-      const applicantNameMatch =
-        entry.applicant_first_name.toLowerCase().includes(searchLower) ||
-        entry.applicant_last_name.toLowerCase().includes(searchLower);
+  //   const searchLower = searchTerm.toLowerCase();
+  //   return userEntries.filter((entry) => {
+  //     const applicantNameMatch =
+  //       entry.applicant_first_name.toLowerCase().includes(searchLower) ||
+  //       entry.applicant_last_name.toLowerCase().includes(searchLower);
 
-      const propertyTypeMatch = entry.type_of_property
-        .toLowerCase()
-        .includes(searchLower);
+  //     const propertyTypeMatch = entry.type_of_property
+  //       .toLowerCase()
+  //       .includes(searchLower);
 
-      const lenderNameMatch = entry.lender_name
-        .toLowerCase()
-        .includes(searchLower);
-      const recordNoMatch = entry.record_no.toLowerCase().includes(searchLower);
+  //     const lenderNameMatch = entry.lender_name
+  //       .toLowerCase()
+  //       .includes(searchLower);
+  //     const recordNoMatch = entry.record_no.toLowerCase().includes(searchLower);
 
-      // If super admin or admin, also search by user name
-      if (currentUser?.role !== "user") {
-        const user = users.find((u) => u.id === entry.user_id);
-        const userNameMatch =
-          user?.name.toLowerCase().includes(searchLower) || false;
-        const userEmailMatch =
-          user?.userName.toLowerCase().includes(searchLower) || false;
-        return (
-          applicantNameMatch ||
-          propertyTypeMatch ||
-          lenderNameMatch ||
-          recordNoMatch ||
-          userNameMatch ||
-          userEmailMatch
-        );
-      }
+  //     // If super admin or admin, also search by user name
+  //     if (currentUser?.role !== "user") {
+  //       const user = users.find((u) => u.id === entry.user_id);
+  //       const userNameMatch =
+  //         user?.name.toLowerCase().includes(searchLower) || false;
+  //       const userEmailMatch =
+  //         user?.userName.toLowerCase().includes(searchLower) || false;
+  //       return (
+  //         applicantNameMatch ||
+  //         propertyTypeMatch ||
+  //         lenderNameMatch ||
+  //         recordNoMatch ||
+  //         userNameMatch ||
+  //         userEmailMatch
+  //       );
+  //     }
 
-      return (
-        applicantNameMatch ||
-        propertyTypeMatch ||
-        lenderNameMatch ||
-        recordNoMatch
-      );
-    });
-  }, [userEntries, searchTerm, currentUser?.role, users]);
+  //     return (
+  //       applicantNameMatch ||
+  //       propertyTypeMatch ||
+  //       lenderNameMatch ||
+  //       recordNoMatch
+  //     );
+  //   });
+  // }, [userEntries, searchTerm, currentUser?.role, users]);
+const filteredEntries = useMemo(() => {
+  if (!searchTerm.trim()) return userEntries;
+
+  const searchLower = searchTerm.toLowerCase();
+  return userEntries.filter((entry) =>
+    entry.record_no.toLowerCase().includes(searchLower)
+  );
+}, [userEntries, searchTerm]);
 
   const handleDeleteAPi = (entryId: string) => {
     deleteDataEntry(entryId);
@@ -136,11 +144,11 @@ export function DataEntryForm() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                My Entries ( {filteredEntries.length} )
+                My Entries ( {filteredEntries?.length} )
               </CardTitle>
 
               <CardDescription className="text-gray-600 dark:text-gray-300">
-                Manage your data entries ({filteredEntries.length} entries)
+                Manage your data entries ({filteredEntries?.length} entries)
               </CardDescription>
             </div>
             {/* <Button
@@ -158,7 +166,7 @@ export function DataEntryForm() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search by applicant name, property type, lender, record no..."
+                placeholder="Search by record no..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-10 transition-all duration-200 focus:ring-2 focus:ring-blue-500"

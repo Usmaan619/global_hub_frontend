@@ -36,6 +36,7 @@ import { LoginForm } from "@/components/login-form";
 export default function LoginPage() {
   const router = useRouter();
   const currentUser = useAuthStore((state) => state.currentUser);
+  console.log('currentUser?.role: ', currentUser?.role);
 
   useEffect(() => {
     if (currentUser?.role === "superadmin") {

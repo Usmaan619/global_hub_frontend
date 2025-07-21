@@ -17,40 +17,44 @@ import { cn } from "@/lib/utils";
 // Define the form data structure based on DataEntry, excluding ID and timestamps
 type FormData = Omit<DataEntry, "id" | "userId" | "createdAt" | "updatedAt">;
 const initialFormData: FormData = {
-  recordNo: "",
-  leadNo: "",
-  applicantFirstName: "",
-  applicantLastName: "",
-  streetAddress: "",
-  city: "",
-  zipCode: "",
-  applicantDob: "",
-  coApplicantFirstName: "",
-  coApplicantLastName: "",
-  bestTimeToCall: "",
-  personalRemark: "",
-  typeOfProperty: "",
-  propertyValue: "",
-  mortgageType: "",
-  loanAmount: "",
-  loanTerm: "",
-  interestType: "",
-  monthlyInstallment: "",
-  existingLoan: "",
-  annualIncome: "",
-  downPayment: "",
-  assetRemark: "",
-  lenderName: "",
-  loanOfficerFirstName: "",
-  loanOfficerLastName: "",
-  trNumber: "",
-  niNumber: "",
-  occupation: "",
-  otherIncome: "",
-  creditCardType: "",
-  creditScore: "",
-  officialRemark: "",
   image: "",
+  user_id: "",
+  admin_id: "",
+  record_no: "",
+  lead_no: "",
+  applicant_first_name: "",
+  applicant_last_name: "",
+  street_address: "",
+  city: "",
+  zip_code: "",
+  applicant_dob: "",
+  co_applicant_first_name: "",
+  co_applicant_last_name: "",
+  best_time_to_call: "",
+  personal_remark: "",
+  type_of_property: "",
+  property_value: "",
+  mortgage_type: "",
+  loan_amount: "",
+  loan_term: "",
+  interest_type: "",
+  monthly_installment: "",
+  existing_loan: "",
+  annual_income: "",
+  down_payment: "",
+  asset_remark: "",
+  lender_name: "",
+  loan_officer_first_name: "",
+  loan_officer_last_name: "",
+  tr_number: "",
+  ni_number: "",
+  occupation: "",
+  other_income: "",
+  credit_card_type: "",
+  credit_score: "",
+  official_remark: "",
+  created_at: "",
+  updated_at: "",
 };
 
 export default function CreateEntryPage() {
@@ -61,28 +65,46 @@ export default function CreateEntryPage() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentUser) {
-      toast({
-        title: "Authentication Error",
-        description: "You must be logged in to create an entry.",
-        variant: "destructive",
-      });
+      showToast(
+        "Authentication Error",
+        "You must be logged in to create an entry.",
+        "destructive"
+      );
       return;
     }
-    console.log("formData: ", formData);
-
-    createDataEntry({
+    if (!formData.image) {
+      showToast(
+        "Missing Image",
+        "Please upload an image before submitting.",
+        "destructive"
+      );
+      return;
+    }
+    const res = await createDataEntry({
       ...formData,
       user_id: currentUser.id,
     });
-    toast({
-      title: "Entry created",
-      description: "Data entry has been created successfully.",
-    });
-    // router.push("/entries") // Redirect back to entries list
+
+    if (res?.success) {
+      showToast("Entry created", "Data entry has been created successfully.");
+      resetForm();
+    }
+  };
+
+  // Utility functions
+  const showToast = (
+    title: string,
+    description: string,
+    variant: "destructive" | "default" = "default"
+  ) => {
+    toast({ title, description, variant });
+  };
+
+  const resetForm = () => {
     setFormData(initialFormData);
     setSelectedImage("");
     if (fileInputRef.current) {
@@ -132,7 +154,6 @@ export default function CreateEntryPage() {
                 selectedImage={selectedImage}
                 setSelectedImage={setSelectedImage}
                 fileInputRef={fileInputRef}
-                handleReset={handleReset}
               />
             </form>
           </div>

@@ -27,11 +27,12 @@ export default function DashboardPage() {
   // }
 
   const renderDashboard = () => {
+    console.log('currentUser?.role: ', currentUser?.role);
     switch (currentUser?.role) {
       case "superadmin":
         return <SuperAdminDashboard />
-      // case "admin":
-      //   return <AdminDashboard />
+      case "admin":
+        return <AdminDashboard />
       default:
         return <Dashboard />
     }

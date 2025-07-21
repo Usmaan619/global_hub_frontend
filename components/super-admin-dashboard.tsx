@@ -57,15 +57,16 @@ import { UserManagement } from "./user-management";
 import { UserOverview } from "./user-overview";
 
 export function SuperAdminDashboard() {
-  const { currentUser, users, dataEntries, getUsersByAdmin } = useAuthStore();
+  const { currentUser, users, dataEntries, getUsersByAdmin, AdminData } =
+    useAuthStore();
   const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
   const [viewAdminDetails, setViewAdminDetails] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  
+
   if (!currentUser || currentUser.role !== "superadmin") {
     return null;
   }
-  console.log('users: ', users);
+  console.log("users: ", users);
 
   const admins = users?.filter((u) => u?.role === "admin");
   const allUsers = users?.filter((u) => u?.role === "user");
@@ -116,11 +117,11 @@ export function SuperAdminDashboard() {
   const monthlyData = generateMonthlyData();
 
   // Admin performance data
-  const adminPerformanceData = adminStats.map((admin) => ({
-    name: "",
-    users: admin.userCount,
-    entries: admin.entryCount,
-  }));
+  // const adminPerformanceData = adminStats.map((admin) => ({
+  //   name: "",
+  //   users: admin.userCount,
+  //   entries: admin.entryCount,
+  // }));
 
   // Role distribution data
   const roleDistributionData = [
@@ -226,6 +227,57 @@ export function SuperAdminDashboard() {
     }));
   }, [dataEntries]);
 
+  const adminPerformanceData = AdminData?.admins.map((admin: any) => ({
+    name: admin.name,
+    users: admin.users.length,
+    entries: admin.total_records_created_by_users,
+  }));
+
+
+  const yearlyDailyData = useMemo(() => {
+  const now = new Date();
+  const data: { [month: string]: { [day: string]: number } } = {};
+
+  // Loop for 12 months (0 = Jan, so go back 11 months)
+  for (let m = 0; m < 12; m++) {
+    const date = new Date(now.getFullYear(), now.getMonth() - m, 1);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthKey = date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+    data[monthKey] = {};
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      data[monthKey][d.toString()] = 0;
+    }
+  }
+
+  // Fill data
+  dataEntries.forEach((entry) => {
+    const entryDate = new Date(entry?.created_at);
+    const year = entryDate.getFullYear();
+    const month = entryDate.getMonth();
+    const day = entryDate.getDate();
+    const monthKey = entryDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+    if (data[monthKey] && data[monthKey][day.toString()] !== undefined) {
+      data[monthKey][day.toString()]++;
+    }
+  });
+
+  // Flatten the data to an array for chart
+  const result = Object.entries(data).flatMap(([month, days]) => {
+    return Object.entries(days).map(([day, entries]) => ({
+      day: `${month} ${day}`,
+      entries,
+    }));
+  });
+
+  return result;
+}, [dataEntries]);
+
+
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -320,7 +372,21 @@ export function SuperAdminDashboard() {
           </CardContent>
         </Card> */}
       </div>
-
+<ResponsiveContainer width="100%" height={350}>
+  <AreaChart data={yearlyDailyData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="day" tick={{ fontSize: 10 }} interval={30} /> {/* show fewer labels */}
+    <YAxis />
+    <Tooltip />
+    <Area
+      type="monotone"
+      dataKey="entries"
+      stroke="#3B82F6"
+      fill="#3B82F6"
+      fillOpacity={0.3}
+    />
+  </AreaChart>
+</ResponsiveContainer> 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="border-0 shadow-lg col-span-full">
@@ -351,6 +417,30 @@ export function SuperAdminDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        {/* <Card className="border-0 shadow-lg col-span-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Users className="h-5 w-5 text-green-600" />
+            <span>Users per Admin</span>
+          </CardTitle>
+          <CardDescription>
+            Number of users and entries under each admin
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={adminPerformanceData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="users" fill="#3B82F6" name="Users" />
+              <Bar dataKey="entries" fill="#10B981" name="Entries" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card> */}
 
         {/* Monthly Entries Chart */}
         {/* <Card className="border-0 shadow-lg">
