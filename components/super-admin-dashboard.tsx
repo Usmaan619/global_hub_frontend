@@ -227,7 +227,7 @@ export function SuperAdminDashboard() {
     }));
   }, [dataEntries]);
 
-  const adminPerformanceData = AdminData?.admins.map((admin: any) => ({
+  const adminPerformanceData = AdminData?.admins?.map((admin: any) => ({
     name: admin.name,
     users: admin.users.length,
     entries: admin.total_records_created_by_users,

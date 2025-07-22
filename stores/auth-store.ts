@@ -94,7 +94,6 @@ interface AuthState {
   fetchAdminAndUser: () => Promise<void>;
 }
 
-
 // ---------- Store Setup ----------
 
 export const useAuthStore = create<AuthState>()(
@@ -214,6 +213,8 @@ export const useAuthStore = create<AuthState>()(
               title: "User created",
               description: `User "${userData.name}" was created successfully.`,
             });
+            await get().fetchAdminAndUser(); // Await to ensure users are fetched before filtering
+
             return true;
           } else {
             return false;
@@ -311,6 +312,7 @@ export const useAuthStore = create<AuthState>()(
 
           const newEntry: DataEntry = response.record;
           set({ dataEntries: [...dataEntries, newEntry] });
+
           return { success: true };
         } catch (error) {
           console.error("Create data entry error:", error);
@@ -367,6 +369,7 @@ export const useAuthStore = create<AuthState>()(
           dataEntries: state.dataEntries.filter((entry) => entry.id !== id),
         }));
       },
+
       getUsersByAdmin: (adminId: string) => {
         console.log("adminId: ", adminId);
         return get().users.filter((user) => user?.createdBy === adminId);
@@ -390,7 +393,8 @@ export const useAuthStore = create<AuthState>()(
             res = await getData(
               `get/admin/user/by/role/id?role=${currentUser.role}`
             );
-          } else if (currentUser.role === "admin") {
+          }
+          if (currentUser.role === "admin") {
             res = await getData(
               `get/admin/user/by/role/id?role=${currentUser.role}&id=${currentUser.id}`
             );
@@ -413,11 +417,12 @@ export const useAuthStore = create<AuthState>()(
 
       fetchDataEntries: async () => {
         const { currentUser } = get();
-        if (!currentUser || currentUser.role !== "superadmin") return;
+        // if (!currentUser || currentUser.role !== "superadmin") return;
 
+        console.log("currentUser.id: fetchDataEntries", currentUser?.id);
         try {
-          const res = await getData(`get/all/records?id=${currentUser.id}`);
-          console.log("Fetched entries: ", res?.record);
+          const res = await getData(`get/all/records?id=${currentUser?.id}`);
+          console.log("Fetched entries: auth", res?.record);
           if (res?.record) {
             set({ dataEntries: res.record });
           }

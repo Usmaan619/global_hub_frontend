@@ -130,13 +130,13 @@ export function AdminDashboard() {
             <h2 className="text-2xl font-bold mb-2">Welcome back, {currentUser?.name}!</h2>
             <p className="text-blue-100">Here's what's happening with your team today.</p>
           </div>
-          <Button
+          {/* <Button
             onClick={() => setShowAnalytics(true)}
             className="bg-white/20 hover:bg-white/30 text-white border-white/30"
           >
             <BarChart3 className="h-4 w-4 mr-2" />
             View Analytics
-          </Button>
+          </Button> */}
         </div>
       </div>
 

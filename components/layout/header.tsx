@@ -35,23 +35,22 @@ export function Header() {
       <div className="flex items-center justify-between">
         {/* Left Side - Mobile Menu and Search */}
         <div className="flex items-center space-x-4 flex-1 max-w-md">
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             onClick={toggleSidebar}
             className="md:hidden"
           >
             <Menu className="h-5 w-5" />
-          </Button>
+          </Button> */}
 
-          <div className="relative flex-1">
+          {/* <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search entries, users..."
               className="pl-10 pr-4 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 transition-colors duration-200"
             />
-            {/* Removed Paste Button */}
-          </div>
+          </div> */}
         </div>
 
         {/* Right Side - Notifications and Profile */}
@@ -77,12 +76,12 @@ export function Header() {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm">
-                    {currentUser ? getInitials(currentUser.userName) : "U"}
+                    {currentUser ? getInitials(currentUser.name) : "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden md:block">
                   <p className="text-sm font-medium dark:text-white">
-                    {currentUser?.userName}
+                    {currentUser?.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                     {currentUser?.role?.replace("_", " ")}

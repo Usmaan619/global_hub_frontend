@@ -34,6 +34,7 @@ export function DataEntryForm() {
     users,
   } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
+  console.log("dataEntries:------------- ", dataEntries);
   const router = useRouter();
 
   const userEntries =
@@ -45,7 +46,7 @@ export function DataEntryForm() {
 
   useEffect(() => {
     fetchDataEntries();
-  }, [currentUser?.role]);
+  }, [currentUser]);
 
   // Enhanced search functionality
   // const filteredEntries = useMemo(() => {
@@ -91,14 +92,14 @@ export function DataEntryForm() {
   //     );
   //   });
   // }, [userEntries, searchTerm, currentUser?.role, users]);
-const filteredEntries = useMemo(() => {
-  if (!searchTerm.trim()) return userEntries;
+  const filteredEntries = useMemo(() => {
+    if (!searchTerm.trim()) return userEntries;
 
-  const searchLower = searchTerm.toLowerCase();
-  return userEntries.filter((entry) =>
-    entry.record_no.toLowerCase().includes(searchLower)
-  );
-}, [userEntries, searchTerm]);
+    const searchLower = searchTerm.toLowerCase();
+    return userEntries.filter((entry) =>
+      entry.record_no.toLowerCase().includes(searchLower)
+    );
+  }, [userEntries, searchTerm]);
 
   const handleDeleteAPi = (entryId: string) => {
     deleteDataEntry(entryId);
@@ -323,7 +324,7 @@ const filteredEntries = useMemo(() => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredEntries?.map((entry ,i) => (
+                  filteredEntries?.map((entry, i) => (
                     <TableRow
                       key={i}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
