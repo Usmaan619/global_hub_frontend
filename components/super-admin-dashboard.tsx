@@ -20,7 +20,7 @@ import {
   Eye,
   BarChart3,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -57,11 +57,25 @@ import { UserManagement } from "./user-management";
 import { UserOverview } from "./user-overview";
 
 export function SuperAdminDashboard() {
-  const { currentUser, users, dataEntries, getUsersByAdmin, AdminData } =
-    useAuthStore();
+  const {
+    currentUser,
+    users,
+    dataEntries,
+    getUsersByAdmin,
+    AdminData,
+    fetchCountAdminAndUser,
+    DashboardData,
+ 
+  } = useAuthStore();
   const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
   const [viewAdminDetails, setViewAdminDetails] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+
+  useEffect(() => {
+    const fetchCountAdminAndUserApi = async () =>
+      await fetchCountAdminAndUser();
+    fetchCountAdminAndUserApi();
+  }, []);
 
   if (!currentUser || currentUser.role !== "superadmin") {
     return null;
@@ -88,6 +102,26 @@ export function SuperAdminDashboard() {
       entries: adminEntries,
     };
   });
+
+  console.log(
+    "super admin-------------------------------DashboardData: ",
+    DashboardData
+  );
+  //   {
+  //     "success": true,
+  //     "total_admins": 1,
+  //     "total_users": 2,
+  //     "total_records": 13,
+  //     "superadmin_summary": [
+  //         {
+  //             "admin_id": 10,
+  //             "admin_name": "Admin namesssssssssssssssssssss",
+  //             "user_count": 2,
+  //             "record_count": 1
+  //         }
+  //     ],
+  //     "admin_detail": null
+  // }
 
   // Generate monthly data for the last 6 months
   const generateMonthlyData = () => {
@@ -233,50 +267,54 @@ export function SuperAdminDashboard() {
     entries: admin.total_records_created_by_users,
   }));
 
-
   const yearlyDailyData = useMemo(() => {
-  const now = new Date();
-  const data: { [month: string]: { [day: string]: number } } = {};
+    const now = new Date();
+    const data: { [month: string]: { [day: string]: number } } = {};
 
-  // Loop for 12 months (0 = Jan, so go back 11 months)
-  for (let m = 0; m < 12; m++) {
-    const date = new Date(now.getFullYear(), now.getMonth() - m, 1);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const monthKey = date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    // Loop for 12 months (0 = Jan, so go back 11 months)
+    for (let m = 0; m < 12; m++) {
+      const date = new Date(now.getFullYear(), now.getMonth() - m, 1);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const monthKey = date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
 
-    data[monthKey] = {};
+      data[monthKey] = {};
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      data[monthKey][d.toString()] = 0;
+      for (let d = 1; d <= daysInMonth; d++) {
+        data[monthKey][d.toString()] = 0;
+      }
     }
-  }
 
-  // Fill data
-  dataEntries.forEach((entry) => {
-    const entryDate = new Date(entry?.created_at);
-    const year = entryDate.getFullYear();
-    const month = entryDate.getMonth();
-    const day = entryDate.getDate();
-    const monthKey = entryDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    // Fill data
+    dataEntries.forEach((entry) => {
+      const entryDate = new Date(entry?.created_at);
+      const year = entryDate.getFullYear();
+      const month = entryDate.getMonth();
+      const day = entryDate.getDate();
+      const monthKey = entryDate.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
 
-    if (data[monthKey] && data[monthKey][day.toString()] !== undefined) {
-      data[monthKey][day.toString()]++;
-    }
-  });
+      if (data[monthKey] && data[monthKey][day.toString()] !== undefined) {
+        data[monthKey][day.toString()]++;
+      }
+    });
 
-  // Flatten the data to an array for chart
-  const result = Object.entries(data).flatMap(([month, days]) => {
-    return Object.entries(days).map(([day, entries]) => ({
-      day: `${month} ${day}`,
-      entries,
-    }));
-  });
+    // Flatten the data to an array for chart
+    const result = Object.entries(data).flatMap(([month, days]) => {
+      return Object.entries(days).map(([day, entries]) => ({
+        day: `${month} ${day}`,
+        entries,
+      }));
+    });
 
-  return result;
-}, [dataEntries]);
-
+    return result;
+  }, [dataEntries]);
 
   return (
     <div className="space-y-6">
@@ -299,32 +337,55 @@ export function SuperAdminDashboard() {
         </div>
       </div>
 
+      {/* <ResponsiveContainer width="100%" height={300}>
+        <AreaChart data={DashboardData?.superadmin_summary}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="admin_name" />
+          <YAxis />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="record_count"
+            stroke="#82ca9d"
+            fill="#82ca9d"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={DashboardData?.superadmin_summary}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="admin_name" />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="user_count" stroke="#8884d8" />
+        </LineChart>
+      </ResponsiveContainer> */}
+
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Daily entries</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Superadmin Direct Users
+            </CardTitle>
             <Building className="h-5 w-5 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-600">
-              {admins.length}
+              {DashboardData?.superadmin_direct_users || 0}
             </div>
             <p className="text-xs text-muted-foreground">Daily</p>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Current Month Entries
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Admin</CardTitle>
             <TrendingUp className="h-5 w-5 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-orange-600">
-              {admins.length > 0
-                ? Math.round(allUsers.length / admins.length)
-                : 0}
+              {DashboardData?.total_admins || 0}
             </div>
             <p className="text-xs text-muted-foreground">Current month</p>
           </CardContent>
@@ -336,7 +397,7 @@ export function SuperAdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
-              {allUsers.length}
+              {DashboardData?.total_users || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Active data entry users
@@ -351,7 +412,7 @@ export function SuperAdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
-              {totalEntries}
+              {DashboardData?.total_records || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Data entries created
@@ -372,21 +433,21 @@ export function SuperAdminDashboard() {
           </CardContent>
         </Card> */}
       </div>
-<ResponsiveContainer width="100%" height={350}>
-  <AreaChart data={yearlyDailyData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="day" tick={{ fontSize: 10 }} interval={30} /> {/* show fewer labels */}
-    <YAxis />
-    <Tooltip />
-    <Area
-      type="monotone"
-      dataKey="entries"
-      stroke="#3B82F6"
-      fill="#3B82F6"
-      fillOpacity={0.3}
-    />
-  </AreaChart>
-</ResponsiveContainer> 
+      {/* <ResponsiveContainer width="100%" height={350}>
+        <AreaChart data={yearlyDailyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" tick={{ fontSize: 10 }} interval={30} />{" "}
+          <YAxis />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="entries"
+            stroke="#3B82F6"
+            fill="#3B82F6"
+            fillOpacity={0.3}
+          />
+        </AreaChart>
+      </ResponsiveContainer> */}
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="border-0 shadow-lg col-span-full">
@@ -401,17 +462,27 @@ export function SuperAdminDashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={currentMonthDailyData}>
+              <AreaChart
+                data={DashboardData?.monthly_creation_stats}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Area
                   type="monotone"
-                  dataKey="entries"
-                  stroke="#3B82F6"
-                  fill="#3B82F6"
-                  fillOpacity={0.3}
+                  dataKey="users"
+                  stackId="1"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="admins"
+                  stackId="1"
+                  stroke="#82ca9d"
+                  fill="#82ca9d"
                 />
               </AreaChart>
             </ResponsiveContainer>

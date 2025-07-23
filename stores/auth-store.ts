@@ -65,6 +65,8 @@ interface AuthState {
   dataEntries: DataEntry[];
   AdminData: any;
 
+  DashboardData: any;
+
   setUserAndToken: (user: User, token: string) => void;
   login: (userName: string, password: string) => boolean;
   logout: () => void;
@@ -92,6 +94,8 @@ interface AuthState {
   fetchDataEntries: () => Promise<void>;
   updateDataEntry: (id: string, entryData: Partial<DataEntry>) => Promise<void>;
   fetchAdminAndUser: () => Promise<void>;
+
+  fetchCountAdminAndUser: () => Promise<void>;
 }
 
 // ---------- Store Setup ----------
@@ -114,6 +118,7 @@ export const useAuthStore = create<AuthState>()(
 
       dataEntries: [],
       AdminData: null, // ✅ <--- Add this line
+      DashboardData: null,
 
       setUserAndToken: (user, token) => set({ currentUser: user, token }),
 
@@ -412,7 +417,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       getDataEntriesByUser: (userId: string) => {
-        return get().dataEntries.filter((entry) => entry.id === userId);
+        return get().dataEntries.filter((entry) => entry?.id === userId);
       },
 
       fetchDataEntries: async () => {
@@ -424,7 +429,32 @@ export const useAuthStore = create<AuthState>()(
           const res = await getData(`get/all/records?id=${currentUser?.id}`);
           console.log("Fetched entries: auth", res?.record);
           if (res?.record) {
-            set({ dataEntries: res.record });
+            set({ dataEntries: res?.record });
+          }
+        } catch (error) {
+          console.error("Failed to fetch data entries:", error);
+        }
+      },
+
+      fetchCountAdminAndUser: async () => {
+        const { currentUser } = get();
+
+        if (!currentUser) return;
+
+        try {
+          let res;
+
+          if (currentUser.role === "superadmin")
+            res = await getData(`static/dashboard`);
+          
+          if (currentUser.role === "admin")
+            res = await getData(`static/dashboard?admin_id=${currentUser.id}`);
+
+          console.log("Fetched entries:======= ", res);
+
+          //  Set fetched users into state
+          if (res?.success) {
+            set({ DashboardData: res });
           }
         } catch (error) {
           console.error("Failed to fetch data entries:", error);

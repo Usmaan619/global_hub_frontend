@@ -18,7 +18,7 @@ export default function Home() {
       router.push("/dashboard");
     }
     if (currentUser?.role === "user") {
-      router.push("/entries");
+      router.push("/dashboard");
     }
   }, [currentUser, router]);
 

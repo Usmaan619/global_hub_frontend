@@ -33,7 +33,7 @@ export function Sidebar() {
       icon: LayoutDashboard,
       label: "Dashboard",
       href: "/dashboard",
-      roles: ["superadmin", "admin"],
+      roles: ["superadmin", "admin", "user"],
     },
     {
       icon: Users,
@@ -42,7 +42,7 @@ export function Sidebar() {
       roles: ["superadmin", "admin"],
     },
 
-      {
+    {
       icon: FileText,
       label: "Add Entry",
       href: "/entries/create",
