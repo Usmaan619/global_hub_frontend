@@ -186,6 +186,7 @@ export function SettingsForm() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Your Name"
+                disabled
               />
             </div>
 

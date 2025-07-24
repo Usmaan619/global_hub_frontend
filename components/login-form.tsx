@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,76 +28,113 @@ export function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const setUserAndToken = useAuthStore((state) => state.setUserAndToken);
+  const { fetchLockStatus, PortalLock, setUserAndToken } = useAuthStore();
+  console.log("PortalLock: ", PortalLock);
+  useEffect(() => {
+    const fetchLockStatusApi = async () => {
+      const res = await fetchLockStatus();
+    };
+    fetchLockStatusApi();
+  }, []);
+
   const router = useRouter();
 
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
   //   setLoading(true);
-
   //   try {
   //     const res = await postData("/auth/login", {
   //       username: UserName,
   //       password,
   //     });
 
-  //
+  //     if (res.success) {
+  //       const user = { ...res.user, role: res.role }; // attach role manually
 
-  //     if (res?.success) {
-  //       toast({
-  //         title: res.message || "Login successful",
-  //         description: "Welcome back!",
-  //       });
-  //       router.push("/dashboard");
+  //       if (res.role === "superadmin") {
+  //         setUserAndToken(user, res.token);
+  //         router.push("/dashboard");
+  //       }
+
+  //       if (!PortalLock) {
+  //         console.log();
+  //         if (res.role === "admin") {
+  //           setUserAndToken(user, res.token);
+  //           router.push("/admin");
+  //         } else {
+  //           setUserAndToken(user, res.token);
+  //           router.push("/entries");
+  //         }
+  //       }
+  //       toast({ title: "Success", description: res.message });
   //     } else {
   //       toast({
   //         title: "Login failed",
-  //         description: res.message || "Invalid credentials",
+  //         description: res.message,
   //         variant: "destructive",
   //       });
   //     }
-  //   } catch (error) {
-  //     const err = error as AxiosError;
-  //
-
+  //   } catch (error: any) {
   //     toast({
-  //       title: "Login failed",
-  //       description: err.message,
+  //       title: "Login error",
+  //       description: error?.message || "Something went wrong",
   //       variant: "destructive",
   //     });
   //   } finally {
   //     setLoading(false);
   //   }
   // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await postData("/auth/login", {
         username: UserName,
         password,
       });
 
-      if (res.success) {
-        const user = { ...res.user, role: res.role }; // attach role manually
-        setUserAndToken(user, res.token);
-
-        toast({ title: "Success", description: res.message });
-
-        if (res.role === "superadmin") {
-          router.push("/dashboard");
-        } else if (res.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/entries");
-        }
-      } else {
+      if (!res.success) {
         toast({
           title: "Login failed",
           description: res.message,
           variant: "destructive",
         });
+        return;
       }
+
+      const user = { ...res.user, role: res.role };
+
+      // Superadmin bypasses portal lock
+      if (res.role === "superadmin") {
+        setUserAndToken(user, res.token);
+        router.push("/dashboard");
+        toast({ title: "Success", description: res.message });
+        return;
+      }
+
+      // Portal locked for non-superadmin
+      if (PortalLock) {
+        toast({
+          title: "Portal Locked",
+          description:
+            "Access is currently restricted. Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Admin or other user
+      setUserAndToken(user, res.token);
+
+      if (res.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/entries");
+      }
+
+      toast({ title: "Success", description: res.message });
     } catch (error: any) {
       toast({
         title: "Login error",
@@ -108,6 +145,7 @@ export function LoginForm() {
       setLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="w-full max-w-md">

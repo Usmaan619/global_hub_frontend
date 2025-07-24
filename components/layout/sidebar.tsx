@@ -59,7 +59,7 @@ export function Sidebar() {
       icon: Settings,
       label: "Settings",
       href: "/settings",
-      roles: ["superadmin", "admin"],
+      roles: ["superadmin", "admin","user"],
     },
   ];
 

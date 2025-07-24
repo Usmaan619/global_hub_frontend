@@ -53,19 +53,22 @@ export function AdminDashboard() {
     getUsersByAdmin,
     dataEntries,
     fetchCountAdminAndUser,
+    fetchAdminAndUser,
     DashboardData,
     AdminData,
   } = useAuthStore();
   const [showAnalytics, setShowAnalytics] = useState(false);
+  useEffect(() => {
+    const fetchCountAdminAndUserApi = async () => {
+      await fetchCountAdminAndUser();
+      await fetchAdminAndUser();
+    };
+    fetchCountAdminAndUserApi();
+  }, []);
 
   if (!currentUser || currentUser.role !== "admin") {
     return null;
   }
-  useEffect(() => {
-    const fetchCountAdminAndUserApi = async () =>
-      await fetchCountAdminAndUser();
-    fetchCountAdminAndUserApi();
-  }, [currentUser]);
 
   console.log(
     "Admin----------------------------------------------DashboardData: ",
@@ -423,7 +426,7 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             {DashboardData?.monthly_user_record_stats_admin?.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
                   data={DashboardData.monthly_user_record_stats_admin}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
