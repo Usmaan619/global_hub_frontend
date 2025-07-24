@@ -64,7 +64,7 @@ interface AuthState {
   users: User[];
   dataEntries: DataEntry[];
   AdminData: any;
-
+  PortalLock: any;
   DashboardData: any;
 
   setUserAndToken: (user: User, token: string) => void;
@@ -96,6 +96,7 @@ interface AuthState {
   fetchAdminAndUser: () => Promise<void>;
 
   fetchCountAdminAndUser: () => Promise<void>;
+  fetchLockStatus: () => Promise<void>;
 }
 
 // ---------- Store Setup ----------
@@ -119,7 +120,7 @@ export const useAuthStore = create<AuthState>()(
       dataEntries: [],
       AdminData: null, // ✅ <--- Add this line
       DashboardData: null,
-
+      PortalLock: null,
       setUserAndToken: (user, token) => set({ currentUser: user, token }),
 
       login: (userName: string, password: string) => {
@@ -446,9 +447,12 @@ export const useAuthStore = create<AuthState>()(
 
           if (currentUser.role === "superadmin")
             res = await getData(`static/dashboard`);
-          
+
           if (currentUser.role === "admin")
             res = await getData(`static/dashboard?admin_id=${currentUser.id}`);
+
+          if (currentUser.role === "user")
+            res = await getData(`static/dashboard?user_id=${currentUser.id}`);
 
           console.log("Fetched entries:======= ", res);
 
@@ -456,6 +460,16 @@ export const useAuthStore = create<AuthState>()(
           if (res?.success) {
             set({ DashboardData: res });
           }
+        } catch (error) {
+          console.error("Failed to fetch data entries:", error);
+        }
+      },
+
+      fetchLockStatus: async () => {
+        try {
+          const res = await getData(`lock-status`);
+          set({ PortalLock: res?.disabled });
+          return res?.disabled;
         } catch (error) {
           console.error("Failed to fetch data entries:", error);
         }

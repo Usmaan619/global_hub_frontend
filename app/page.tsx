@@ -6,7 +6,7 @@ import { LoginForm } from "@/components/login-form";
 import { useAuthStore } from "@/stores/auth-store";
 
 export default function Home() {
-  const currentUser = useAuthStore((state) => state.currentUser);
+  const { currentUser, PortalLock } = useAuthStore();
   const router = useRouter();
 
   console.log("currentUser: ", currentUser);
@@ -14,12 +14,15 @@ export default function Home() {
     if (currentUser?.role === "superadmin") {
       router.push("/dashboard");
     }
+
+    // if (PortalLock) {
     if (currentUser?.role === "admin") {
       router.push("/dashboard");
     }
     if (currentUser?.role === "user") {
       router.push("/dashboard");
     }
+    // }
   }, [currentUser, router]);
 
   if (currentUser) {

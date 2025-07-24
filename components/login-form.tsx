@@ -41,7 +41,7 @@ export function LoginForm() {
   //       password,
   //     });
 
-  //     console.log("res:----------- ", res);
+  //
 
   //     if (res?.success) {
   //       toast({
@@ -58,7 +58,7 @@ export function LoginForm() {
   //     }
   //   } catch (error) {
   //     const err = error as AxiosError;
-  //     console.log("err: ", err);
+  //
 
   //     toast({
   //       title: "Login failed",
@@ -188,9 +188,13 @@ export function LoginForm() {
               >
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
+
+              <div className="text-center mt-6 text-sm text-gray-500">
+                <p>© 2024 Global Hub. All rights reserved.</p>
+              </div>
             </form>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm font-medium text-gray-700 mb-2">
                 Demo Accounts:
               </p>
@@ -208,13 +212,9 @@ export function LoginForm() {
                   Password for all: <strong>password123</strong>
                 </p>
               </div>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
-
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2024 Global Hub. All rights reserved.</p>
-        </div>
       </div>
     </div>
   );

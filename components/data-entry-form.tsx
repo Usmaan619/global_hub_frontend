@@ -34,13 +34,11 @@ export function DataEntryForm() {
     users,
   } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
-  console.log("dataEntries:------------- ", dataEntries);
+  console.log("dataEntries: ", dataEntries);
+
   const router = useRouter();
 
-  const userEntries =
-    currentUser?.role === "user"
-      ? getDataEntriesByUser(currentUser.id)
-      : dataEntries;
+  const userEntries = currentUser?.role === "user" ? dataEntries : [];
 
   const fetchDataEntries = useAuthStore((state) => state.fetchDataEntries);
 
@@ -48,50 +46,6 @@ export function DataEntryForm() {
     fetchDataEntries();
   }, [currentUser]);
 
-  // Enhanced search functionality
-  // const filteredEntries = useMemo(() => {
-  //   if (!searchTerm.trim()) return userEntries;
-
-  //   const searchLower = searchTerm.toLowerCase();
-  //   return userEntries.filter((entry) => {
-  //     const applicantNameMatch =
-  //       entry.applicant_first_name.toLowerCase().includes(searchLower) ||
-  //       entry.applicant_last_name.toLowerCase().includes(searchLower);
-
-  //     const propertyTypeMatch = entry.type_of_property
-  //       .toLowerCase()
-  //       .includes(searchLower);
-
-  //     const lenderNameMatch = entry.lender_name
-  //       .toLowerCase()
-  //       .includes(searchLower);
-  //     const recordNoMatch = entry.record_no.toLowerCase().includes(searchLower);
-
-  //     // If super admin or admin, also search by user name
-  //     if (currentUser?.role !== "user") {
-  //       const user = users.find((u) => u.id === entry.user_id);
-  //       const userNameMatch =
-  //         user?.name.toLowerCase().includes(searchLower) || false;
-  //       const userEmailMatch =
-  //         user?.userName.toLowerCase().includes(searchLower) || false;
-  //       return (
-  //         applicantNameMatch ||
-  //         propertyTypeMatch ||
-  //         lenderNameMatch ||
-  //         recordNoMatch ||
-  //         userNameMatch ||
-  //         userEmailMatch
-  //       );
-  //     }
-
-  //     return (
-  //       applicantNameMatch ||
-  //       propertyTypeMatch ||
-  //       lenderNameMatch ||
-  //       recordNoMatch
-  //     );
-  //   });
-  // }, [userEntries, searchTerm, currentUser?.role, users]);
   const filteredEntries = useMemo(() => {
     if (!searchTerm.trim()) return userEntries;
 
@@ -101,9 +55,7 @@ export function DataEntryForm() {
     );
   }, [userEntries, searchTerm]);
 
-  const handleDeleteAPi = (entryId: string) => {
-    deleteDataEntry(entryId);
-  };
+  console.log("filteredEntries: ", filteredEntries);
 
   // Removed handleCopy function
 
@@ -111,6 +63,7 @@ export function DataEntryForm() {
     setSearchTerm("");
   };
 
+  console.log("users: ", users);
   const getUserName = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user?.name || "Unknown User";
@@ -119,7 +72,7 @@ export function DataEntryForm() {
   const handleDelete = async (entryId: string) => {
     try {
       const res = await deleteData(`delete/record/by/id/${entryId}`);
-      console.log("res: ", res);
+
       if (res?.success) {
         deleteDataEntry(entryId);
         toast({
@@ -128,7 +81,6 @@ export function DataEntryForm() {
         });
       }
     } catch (error) {
-      console.log("error: ", error);
       const err = error as any;
 
       toast({
@@ -301,7 +253,7 @@ export function DataEntryForm() {
                     Official Remark
                   </TableHead>
 
-                  {currentUser?.role !== "user" && (
+                  {currentUser?.role === "superadmin" && (
                     <TableHead className=" min-w-[200px] max-w-[300px]">
                       Created By
                     </TableHead>
@@ -459,7 +411,7 @@ export function DataEntryForm() {
                       </TableCell>
 
                       {/* Created By and Timestamp */}
-                      {currentUser?.role !== "user" && (
+                      {currentUser?.role === "superadmin" && (
                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                           <Badge variant="outline">
                             {getUserName(entry?.user_id)}

@@ -56,7 +56,7 @@ export function UserManagement() {
   } = useAuthStore();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
-  console.log("editingUser:=================== ", editingUser);
+
   const [formData, setFormData] = useState<any>({
     name: "",
     userName: "",
@@ -74,28 +74,23 @@ export function UserManagement() {
 
   useEffect(() => {}, [AdminData]);
 
-  console.log("AdminData:managementpages----- ", AdminData);
-
-  console.log("currentUser: ", currentUser);
   const canCreateUsers =
     currentUser?.role === "superadmin" || currentUser?.role === "admin";
   const availableRoles =
     currentUser?.role === "superadmin" ? ["admin", "user"] : ["user"];
   // ["admin", "user"]
-  console.log("canCreateUsers: ", canCreateUsers);
 
   const displayUsers =
     currentUser?.role === "superadmin"
       ? users.filter((u) => u?.role !== "superadmin")
       : getUsersByAdmin(currentUser?.id || "");
 
-  console.log("displayUsers: ", displayUsers);
   // Removed handlePaste function
 
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
 
-  //   console.log("editingUser: ", editingUser);
+  //
   //   if (editingUser) {
   //     // updateUser(editingUser.id, formData);
 
@@ -126,9 +121,9 @@ export function UserManagement() {
   //         });
   //       }
 
-  //       console.log("res: ", res);
+  //
   //     } catch (error) {
-  //       console.log("error: ", error);
+  //
   //     }
   //   } else {
   //     const success = createUser(formData);
@@ -168,13 +163,8 @@ export function UserManagement() {
     });
   };
 
-  useEffect(() => {
-    if (!isCreateDialogOpen) resetForm();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("editingUser: ", editingUser);
 
     const showToast = (
       title: string,
@@ -210,8 +200,6 @@ export function UserManagement() {
           await fetchAdminAndUser();
           showToast("Admin updated", "Admin has been updated successfully.");
         }
-
-        console.log("res: ", res);
       } else {
         const success = createUser(formData);
         if (success) {
@@ -227,14 +215,12 @@ export function UserManagement() {
         }
       }
     } catch (error) {
-      console.log("error: ", error);
     } finally {
       resetForm();
     }
   };
 
   const handleEdit = async (user: any) => {
-    console.log("user: ", user);
     setEditingUser(user);
     setFormData({
       name: user.name,
@@ -261,7 +247,6 @@ export function UserManagement() {
   };
 
   const handleDelete = async (userId: string) => {
-    console.log("userId: ", userId);
     // deleteUser(userId);
 
     try {
@@ -279,8 +264,6 @@ export function UserManagement() {
         res = await deleteData(`/delete/user/by/id/${userId}`);
       }
 
-      console.log("res: ", res);
-
       if (res?.success) {
         const msg = currentUser?.role === "superadmin" ? "Admin" : "User";
         toast({
@@ -289,14 +272,10 @@ export function UserManagement() {
         });
         await fetchAdminAndUser();
       }
-      console.log("res: ", res);
-    } catch (error) {
-      console.log("error: ", error);
-    }
+    } catch (error) {}
   };
 
   const [showUserLimit, setShowUserLimit] = useState<any>("");
-  console.log("showUserLimit: ", showUserLimit);
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -312,36 +291,69 @@ export function UserManagement() {
   };
   const [viewUser, setViewUser] = useState<any>(null);
 
-  const handleDonwloadCSV = async (u: any) => {
-    console.log("u:handleDonwloadCSV ", u);
+  const handleDonwloadCSV = async (user: any) => {
+    if (!user?.id) {
+      toast({
+        title: "Invalid User",
+        description: "User ID is missing or invalid.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const response = await axios.get(
-        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
+        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${user.id}`,
         {
-          responseType: "blob", // 👈 VERY important
+          responseType: "blob",
         }
       );
 
-      // Create a blob from the response
       const blob = new Blob([response.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
-      // Create download link
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = `user_${u?.id}_records.xlsx`;
+      link.download = `user_${user.name}_records.xlsx`;
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error("Download failed:", error);
-      alert("Failed to download Excel file.");
+    } catch (error: any) {
+      if (error.response && error.response.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const result = JSON.parse(reader.result as string);
+            console.log("result: ", result);
+            toast({
+              title: "Download Failed",
+              description: result.message || "No records found for this user.",
+              variant: "destructive",
+            });
+          } catch {
+            toast({
+              title: "Download Failed",
+              description: "Unable to parse error response.",
+              variant: "destructive",
+            });
+          }
+        };
+        reader.readAsText(error.response.data);
+      } else {
+        toast({
+          title: "Download Error",
+          description: "Something went wrong while downloading the file.",
+          variant: "destructive",
+        });
+      }
+
+      console.error("Download error:", error);
     }
   };
-  console.log("isCreateDialogOpen: ", isCreateDialogOpen);
+
   return (
     <Card>
       <CardHeader>
@@ -355,7 +367,10 @@ export function UserManagement() {
           {canCreateUsers && (
             <Dialog
               open={isCreateDialogOpen}
-              onOpenChange={setIsCreateDialogOpen}
+              onOpenChange={(o: any) => {
+                setIsCreateDialogOpen(o);
+                resetForm();
+              }}
             >
               <DialogTrigger asChild>
                 <Button>
@@ -435,7 +450,7 @@ export function UserManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {formData.role === "admin" && (
+                  {formData.role === "superadmin" && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="user_limit">User limit</Label>

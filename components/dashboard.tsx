@@ -12,7 +12,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { Download, Users, FileText, UserCheck, BarChart3 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AnalyticsDashboard } from "./analytics-dashboard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   XAxis,
   YAxis,
@@ -30,7 +30,20 @@ export function Dashboard() {
     dataEntries,
     getUsersByAdmin,
     getDataEntriesByUser,
+    fetchCountAdminAndUser,
+    DashboardData,
   } = useAuthStore();
+  console.log(
+    "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppDashboardData: ",
+    DashboardData
+  );
+
+  useEffect(() => {
+    const fetchCountAdminAndUserApi = async () =>
+      await fetchCountAdminAndUser();
+    fetchCountAdminAndUserApi();
+  }, []);
+
   const [showAnalytics, setShowAnalytics] = useState(false);
 
   const generateCSV = (data: any[], filename: string) => {
@@ -133,8 +146,8 @@ export function Dashboard() {
     }
 
     // Combine users and their data entries
-    const combinedData = allUsers.map((user) => {
-      const userEntries = allEntries.filter(
+    const combinedData = allUsers?.map((user) => {
+      const userEntries = allEntries?.filter(
         (entry) => entry.user_id === user.id
       );
       return {
@@ -227,7 +240,13 @@ export function Dashboard() {
       </div>
     );
   }
-
+  const userDailyData = DashboardData?.daily_user_record_stats?.map(
+    (item: any) => ({
+      date: new Date(item.date).toLocaleDateString("en-US"), // X axis
+      entries: item.record_count, // Y axis
+    })
+  );
+  console.log("userDailyData: ", userDailyData);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -274,13 +293,13 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {stats.entries}
+              {DashboardData?.total_user_record_count || 0}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid  gap-6">
         {/* User Monthly Chart (for users only) */}
         {currentUser?.role === "user" && (
           <Card className="border-0 shadow-lg">
@@ -294,21 +313,57 @@ export function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={userMonthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="entries"
-                    stroke="#3B82F6"
-                    fill="#3B82F6"
-                    fillOpacity={0.3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {DashboardData?.daily_user_record_stats?.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart
+                    data={userDailyData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="colorRecords"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#82ca9d"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#82ca9d"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="entries"
+                      stroke="#82ca9d"
+                      fillOpacity={1}
+                      fill="url(#colorRecords)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div
+                  style={{
+                    height: 250,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  No data found
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

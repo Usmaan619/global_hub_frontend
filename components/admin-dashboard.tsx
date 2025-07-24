@@ -65,7 +65,7 @@ export function AdminDashboard() {
     const fetchCountAdminAndUserApi = async () =>
       await fetchCountAdminAndUser();
     fetchCountAdminAndUserApi();
-  }, []);
+  }, [currentUser]);
 
   console.log(
     "Admin----------------------------------------------DashboardData: ",
@@ -181,7 +181,6 @@ export function AdminDashboard() {
   }
 
   const handleDonwloadCSV = async (u: any) => {
-    console.log("u:handleDonwloadCSV ", u);
     try {
       const response = await axios.get(
         `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
@@ -205,13 +204,12 @@ export function AdminDashboard() {
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
-      console.error("Download failed:", error);
       alert("Failed to download Excel file.");
     }
   };
 
   const handleEdit = async (user: any) => {
-    // console.log("user: ", user);
+    //
     // setEditingUser(user);
     // setFormData({
     //   name: user.name,
@@ -237,7 +235,6 @@ export function AdminDashboard() {
   };
 
   const handleDelete = async (userId: string) => {
-    console.log("userId: ", userId);
     // deleteUser(userId);
 
     try {
@@ -255,8 +252,6 @@ export function AdminDashboard() {
         res = await deleteData(`/delete/user/by/id/${userId}`);
       }
 
-      console.log("res: ", res);
-
       if (res?.success) {
         const msg = currentUser?.role === "superadmin" ? "Admin" : "User";
         toast({
@@ -265,10 +260,7 @@ export function AdminDashboard() {
         });
         await fetchCountAdminAndUser();
       }
-      console.log("res: ", res);
-    } catch (error) {
-      console.log("error: ", error);
-    }
+    } catch (error) {}
   };
 
   return (
@@ -430,32 +422,44 @@ export function AdminDashboard() {
             <CardDescription>Monthly data entry activity</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart
-                data={DashboardData?.monthly_user_record_stats_admin}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            {DashboardData?.monthly_user_record_stats_admin?.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart
+                  data={DashboardData.monthly_user_record_stats_admin}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="user_name"
+                    stackId="1"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="record_count"
+                    stackId="1"
+                    stroke="#82ca9d"
+                    fill="#82ca9d"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div
+                style={{
+                  height: 250,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-
-                <Area
-                  type="monotone"
-                  dataKey="user_name"
-                  stackId="1"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="record_count"
-                  stackId="1"
-                  stroke="#82ca9d"
-                  fill="#82ca9d"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+                No data found
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

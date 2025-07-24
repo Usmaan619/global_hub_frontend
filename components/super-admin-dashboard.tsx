@@ -65,7 +65,6 @@ export function SuperAdminDashboard() {
     AdminData,
     fetchCountAdminAndUser,
     DashboardData,
- 
   } = useAuthStore();
   const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
   const [viewAdminDetails, setViewAdminDetails] = useState(false);
@@ -80,7 +79,6 @@ export function SuperAdminDashboard() {
   if (!currentUser || currentUser.role !== "superadmin") {
     return null;
   }
-  console.log("users: ", users);
 
   const admins = users?.filter((u) => u?.role === "admin");
   const allUsers = users?.filter((u) => u?.role === "user");

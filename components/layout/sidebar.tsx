@@ -58,7 +58,7 @@ export function Sidebar() {
     {
       icon: Settings,
       label: "Settings",
-      href: "",
+      href: "/settings",
       roles: ["superadmin", "admin"],
     },
   ];
