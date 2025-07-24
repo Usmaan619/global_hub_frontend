@@ -10,7 +10,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/auth-store";
-import { Users, FileText, UserPlus, Calendar, BarChart3 } from "lucide-react";
+import {
+  Users,
+  FileText,
+  UserPlus,
+  Calendar,
+  BarChart3,
+  FileDown,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +35,17 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import axios from "axios";
+import { deleteData } from "@/services/api";
+import { toast } from "./ui/use-toast";
 
 export function AdminDashboard() {
   const {
@@ -34,6 +54,7 @@ export function AdminDashboard() {
     dataEntries,
     fetchCountAdminAndUser,
     DashboardData,
+    AdminData,
   } = useAuthStore();
   const [showAnalytics, setShowAnalytics] = useState(false);
 
@@ -46,7 +67,10 @@ export function AdminDashboard() {
     fetchCountAdminAndUserApi();
   }, []);
 
-    console.log('Admin----------------------------------------------DashboardData: ', DashboardData);
+  console.log(
+    "Admin----------------------------------------------DashboardData: ",
+    DashboardData
+  );
 
   const myUsers = getUsersByAdmin(currentUser.id);
   const user_ids = myUsers?.map((u) => u.id);
@@ -156,6 +180,97 @@ export function AdminDashboard() {
     );
   }
 
+  const handleDonwloadCSV = async (u: any) => {
+    console.log("u:handleDonwloadCSV ", u);
+    try {
+      const response = await axios.get(
+        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
+        {
+          responseType: "blob", // 👈 VERY important
+        }
+      );
+
+      // Create a blob from the response
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      // Create download link
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `user_${u?.id}_records.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Failed to download Excel file.");
+    }
+  };
+
+  const handleEdit = async (user: any) => {
+    // console.log("user: ", user);
+    // setEditingUser(user);
+    // setFormData({
+    //   name: user.name,
+    //   userName: user.username,
+    //   password:
+    //     currentUser?.role === "superadmin"
+    //       ? user.admin_password
+    //       : user.password,
+    //   role: user.role,
+    //   user_limit: user.user_limit,
+    // });
+    //     {
+    //     "admin_id": 4,
+    //     "name": "p",
+    //     "username": "p",
+    //     "admin_created_at": "2025-07-19T17:55:21.000Z",
+    //     "user_limit": 6,
+    //     "role_name": "admin",
+    //     "admin_password": "p",
+    //     "user_count": 0,
+    //     "users": []
+    // }
+  };
+
+  const handleDelete = async (userId: string) => {
+    console.log("userId: ", userId);
+    // deleteUser(userId);
+
+    try {
+      let res;
+      // superadmin
+      // /delete/admin/user/by/id/:id
+
+      // admin
+      // delete/user/by/id/:id
+
+      // if (currentUser?.role === "superadmin") {
+      //   res = await deleteData(`/delete/admin/user/by/id/${userId}`);
+      // }
+      if (currentUser?.role === "admin") {
+        res = await deleteData(`/delete/user/by/id/${userId}`);
+      }
+
+      console.log("res: ", res);
+
+      if (res?.success) {
+        const msg = currentUser?.role === "superadmin" ? "Admin" : "User";
+        toast({
+          title: `${msg} deleted`,
+          description: `${msg} has been deleted successfully.`,
+        });
+        await fetchCountAdminAndUser();
+      }
+      console.log("res: ", res);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -251,14 +366,14 @@ export function AdminDashboard() {
               } */}
               {DashboardData?.admin_detail?.user_record_count || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
-              User entries 
-            </p>
+            <p className="text-xs text-muted-foreground">User entries</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Charts Section */}
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"> */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Monthly Entries Chart */}
         {/* <Card className="border-0 shadow-lg">
@@ -283,7 +398,7 @@ export function AdminDashboard() {
         </Card> */}
 
         {/* User Performance Chart */}
-        <Card className="border-0 shadow-lg">
+        {/* <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-green-600" />
@@ -304,11 +419,49 @@ export function AdminDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
+        </Card> */}
+
+        <Card className="border-0 shadow-lg col-span-full">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              <span>Months Entries</span>
+            </CardTitle>
+            <CardDescription>Monthly data entry activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart
+                data={DashboardData?.monthly_user_record_stats_admin}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+
+                <Area
+                  type="monotone"
+                  dataKey="user_name"
+                  stackId="1"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="record_count"
+                  stackId="1"
+                  stroke="#82ca9d"
+                  fill="#82ca9d"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
         </Card>
       </div>
 
       {/* Daily Activity Chart */}
-      <div className="grid grid-cols-1 gap-6 mb-6">
+      {/* <div className="grid grid-cols-1 gap-6 mb-6">
         <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -337,9 +490,9 @@ export function AdminDashboard() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      </div> */}
+      <div className="grid  gap-6">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
         {/* My Users Overview */}
         <Card className="border-0 shadow-lg">
           <CardHeader>
@@ -347,7 +500,88 @@ export function AdminDashboard() {
             <CardDescription>Users you have created and manage</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            {currentUser?.role === "admin" && (
+              <Table>
+                <TableHeader>
+                  <TableRow className="flex-row justify-center w-full">
+                    <TableHead className="text-center">No.</TableHead>
+                    <TableHead className="text-center">Name</TableHead>
+                    <TableHead className="text-center">Username</TableHead>
+                    <TableHead className="text-center">Password</TableHead>
+                    <TableHead className="text-center">
+                      Total Entries Created
+                    </TableHead>
+                    <TableHead className="text-center">Role</TableHead>
+                    <TableHead className="text-center">Created Date</TableHead>
+                    {/* <TableHead className="text-center">Actions</TableHead> */}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {AdminData?.admin_users?.length > 0 ? (
+                    AdminData.admin_users.map((user: any, idx: any) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-center">{idx + 1}</TableCell>
+                        <TableCell className="text-center">
+                          {user?.name}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {user?.username}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {user?.password}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {user?.record_count}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {user?.role}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {new Date(user?.created_at).toLocaleDateString()}
+                        </TableCell>
+                        {/* <TableCell className="text-center justify-center">
+                          <div className="flex space-x-2 justify-center">
+                            
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDonwloadCSV(user)}
+                            >
+                              <FileDown color="green" size={23} />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(user)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDelete(user?.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell> */}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center">
+                        No data found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* <div className="space-y-4">
               {myUsers.length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">
                   No users created yet. Go to User Management to add users.
@@ -355,7 +589,7 @@ export function AdminDashboard() {
               ) : (
                 myUsers.map((user) => {
                   const userEntries = dataEntries.filter(
-                    (entry) => entry.user_id === user.id
+                    (entry) => entry?.user_id === user.id
                   );
                   return (
                     <div
@@ -380,9 +614,7 @@ export function AdminDashboard() {
                   );
                 })
               )}
-            </div>
-          </CardContent>
-        </Card>
+            </div> */}
 
         {/* Recent Activity */}
         {/* <Card className="border-0 shadow-lg">

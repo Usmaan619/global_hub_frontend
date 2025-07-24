@@ -158,19 +158,23 @@ export function UserManagement() {
   //   });
   // };
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      userName: "",
+      password: "",
+      role: "admin",
+      user_limit: "",
+    });
+  };
+
+  useEffect(() => {
+    if (!isCreateDialogOpen) resetForm();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("editingUser: ", editingUser);
-
-    const resetForm = () => {
-      setFormData({
-        name: "",
-        userName: "",
-        password: "",
-        role: "admin",
-        user_limit: "",
-      });
-    };
 
     const showToast = (
       title: string,
@@ -337,7 +341,7 @@ export function UserManagement() {
       alert("Failed to download Excel file.");
     }
   };
-
+  console.log("isCreateDialogOpen: ", isCreateDialogOpen);
   return (
     <Card>
       <CardHeader>
