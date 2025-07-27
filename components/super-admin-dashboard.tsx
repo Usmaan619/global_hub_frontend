@@ -55,6 +55,7 @@ import {
 } from "recharts";
 import { UserManagement } from "./user-management";
 import { UserOverview } from "./user-overview";
+import { AmdinManagement } from "./admin-management";
 
 export function SuperAdminDashboard() {
   const {
@@ -727,6 +728,12 @@ export function SuperAdminDashboard() {
           </CardContent>
         </Card> */}
       </div>
+
+      <div className="space-y-6">
+        <AmdinManagement />
+        <UserOverview />
+      </div>
+
       <div className="space-y-6">
         <UserManagement />
         <UserOverview />

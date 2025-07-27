@@ -85,6 +85,72 @@ export function LoginForm() {
   //   }
   // };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await postData("/auth/login", {
+  //       username: UserName,
+  //       password,
+  //     });
+
+  //     console.log("res: ", res);
+
+  //     //       useAuthStore.getState().setCurrentUser(res.user);
+  //     // useAuthStore.getState().setToken(token);
+
+  //     if (!res.success) {
+  //       toast({
+  //         title: "Login failed",
+  //         description: res.message,
+  //         variant: "destructive",
+  //       });
+  //       return;
+  //     }
+
+  //     const user = { ...res.user, role: res.role };
+
+  //     // Superadmin bypasses portal lock
+  //     if (res.role === "superadmin") {
+  //       setUserAndToken(user, res.token);
+  //       router.push("/dashboard");
+  //       toast({ title: "Success", description: res.message });
+  //       return;
+  //     }
+
+  //     // Portal locked for non-superadmin
+  //     if (PortalLock) {
+  //       toast({
+  //         title: "Portal Locked",
+  //         description:
+  //           "Access is currently restricted. Please try again later.",
+  //         variant: "destructive",
+  //       });
+  //       return;
+  //     }
+
+  //     // Admin or other user
+  //     setUserAndToken(user, res.token);
+
+  //     if (res.role === "admin") {
+  //       router.push("/admin");
+  //     } else {
+  //       router.push("/entries");
+  //     }
+
+  //     toast({ title: "Success", description: res.message });
+  //   } catch (error: any) {
+  //     toast({
+  //       title: "Login error",
+  //       description: error?.message || "Something went wrong",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -106,16 +172,8 @@ export function LoginForm() {
 
       const user = { ...res.user, role: res.role };
 
-      // Superadmin bypasses portal lock
-      if (res.role === "superadmin") {
-        setUserAndToken(user, res.token);
-        router.push("/dashboard");
-        toast({ title: "Success", description: res.message });
-        return;
-      }
-
-      // Portal locked for non-superadmin
-      if (PortalLock) {
+      // Portal lock check (optional)
+      if (res.role !== "superadmin" && PortalLock) {
         toast({
           title: "Portal Locked",
           description:
@@ -125,13 +183,16 @@ export function LoginForm() {
         return;
       }
 
-      // Admin or other user
+      // Save user & token in Zustand + sessionStorage
       setUserAndToken(user, res.token);
 
+      // Redirect by role
       if (res.role === "admin") {
         router.push("/admin");
-      } else {
+      } else if (res.role === "user") {
         router.push("/entries");
+      } else {
+        router.push("/dashboard");
       }
 
       toast({ title: "Success", description: res.message });
@@ -147,25 +208,28 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div
+      className="min-h-screen flex items-center justify-center text-white 
+    bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600"
+    >
       <div className="w-full max-w-md">
         {/* Logo Section */}
-        <div className="text-center mb-8">
-          <img
-            src="/images/logo.png"
-            alt="Global Hub - Business Process Outsourcing"
-            className="h-20 mx-auto mb-4"
-          />
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Data Entry Portal
-          </h1>
-          <p className="text-gray-600">
-            Secure access to your business data management system
-          </p>
-        </div>
 
         <Card className="shadow-xl border-0">
           <CardHeader className="text-center pb-4">
+            <div className="text-center mb-8">
+              <img
+                src="/images/logo.png"
+                alt="Global Hub - Business Process Outsourcing"
+                className="h-20 mx-auto mb-4"
+              />
+              <h1 className="text-2xl font-bold mb-2">
+                Data Entry Portal
+              </h1>
+              <p className="">
+                Secure access to your business data management system
+              </p>
+            </div>
             <CardTitle className="text-xl">Welcome Back</CardTitle>
             <CardDescription>Sign in to access your dashboard</CardDescription>
           </CardHeader>

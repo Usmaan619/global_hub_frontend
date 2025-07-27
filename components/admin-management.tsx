@@ -42,8 +42,9 @@ import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
 import { deleteData, getData, postData } from "@/services/api";
 import axios from "axios";
+import { Tooltip } from "./ui/tooltip";
 
-export function UserManagement() {
+export function AmdinManagement() {
   const {
     currentUser,
     users,
@@ -63,7 +64,7 @@ export function UserManagement() {
     name: "",
     userName: "",
     password: "",
-    role: "user",
+    role: "user" as "admin" | "user",
     user_limit: "",
   });
   useEffect(() => {
@@ -79,7 +80,7 @@ export function UserManagement() {
   const canCreateUsers =
     currentUser?.role === "superadmin" || currentUser?.role === "admin";
   const availableRoles =
-    currentUser?.role === "superadmin" ? ["user"] : ["user"];
+    currentUser?.role === "superadmin" ? ["admin"] : ["admin"];
   // ["admin", "user"]
 
   const displayUsers =
@@ -87,80 +88,12 @@ export function UserManagement() {
       ? users.filter((u) => u?.role !== "superadmin")
       : getUsersByAdmin(currentUser?.id || "");
 
-  // Removed handlePaste function
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //
-  //   if (editingUser) {
-  //     // updateUser(editingUser.id, formData);
-
-  //     try {
-  //       let res;
-
-  //       if (currentUser?.role === "superadmin")
-  //         res = await postData(`/update/admin/${editingUser?.admin_id}`, {
-  //           name: formData.name,
-  //           username: formData.userName,
-  //           password: formData.password,
-  //           user_limit: formData.user_limit,
-  //         });
-
-  //       if (currentUser?.role === "admin")
-  //         res = await postData(`update/user/by/id${editingUser?.id}`, {
-  //           name: formData.name,
-  //           username: formData.userName,
-  //           password: formData.password,
-  //         });
-  //       if (res?.success) {
-  //         setEditingUser(null);
-  //         await fetchAdminAndUser();
-
-  //         toast({
-  //           title: "Admin updated",
-  //           description: "Admin has been updated successfully.",
-  //         });
-  //       }
-
-  //
-  //     } catch (error) {
-  //
-  //     }
-  //   } else {
-  //     const success = createUser(formData);
-  //     if (success) {
-  //       toast({
-  //         title: "User created",
-  //         description: "User has been created successfully.",
-  //       });
-  //       setIsCreateDialogOpen(false);
-  //       await fetchAdminAndUser();
-  //     } else {
-  //       toast({
-  //         title: "Failed to create user",
-  //         description:
-  //           "You may have reached the user limit or lack permissions.",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   }
-
-  //   setFormData({
-  //     name: "",
-  //     userName: "",
-  //     password: "",
-  //     role: "admin",
-  //     user_limit: "",
-  //   });
-  // };
-
   const resetForm = () => {
     setFormData({
       name: "",
       userName: "",
       password: "",
-      role: "user",
+      role: "admin",
       user_limit: "",
     });
   };
@@ -177,9 +110,7 @@ export function UserManagement() {
     };
 
     const isSuperadmin = currentUser?.role === "superadmin";
-    console.log("isSuperadmin: ", isSuperadmin);
     const isAdmin = currentUser?.role === "admin";
-    console.log("isAdmin: ", isAdmin);
 
     try {
       if (editingUser) {
@@ -190,14 +121,13 @@ export function UserManagement() {
           password: formData.password,
         };
 
-        console.log("editingUser: ", editingUser);
         if (isSuperadmin) {
-          endpoint = `/update/user/by/id/${editingUser.id}`;
+          endpoint = `/update/admin/${editingUser.admin_id}`;
           payload.user_limit = formData.user_limit;
         } else if (isAdmin) {
           endpoint = `/update/user/by/id/${editingUser.id}`;
         }
-        // User limit reached for this admin
+
         const res = await postData(endpoint, payload);
 
         if (res?.success) {
@@ -211,26 +141,15 @@ export function UserManagement() {
           showToast("User created", "User has been created successfully.");
           setIsCreateDialogOpen(false);
           await fetchAdminAndUser();
+        } else {
+          showToast(
+            "Failed to create user",
+            "You may have reached the user limit or lack permissions.",
+            "destructive"
+          );
         }
-        // else {
-        //   showToast(
-        //     "Failed to create user",
-        //     "You may have reached the user limit or lack permissions.",
-        //     "destructive"
-        //   );
-        // }
       }
     } catch (error) {
-      // console.log(
-      //   "ssssssssssssssssssssssssssssssssssssssssssssssserror: ",
-      //   error
-      // );
-      // const err = error as any;
-      // showToast(
-      //   "Failed to create user",
-      //   err?.response?.data?.message,
-      //   "destructive"
-      // );
     } finally {
       resetForm();
     }
@@ -241,9 +160,12 @@ export function UserManagement() {
     setFormData({
       name: user.name,
       userName: user.username,
-      password: user.password,
+      password:
+        currentUser?.role === "superadmin"
+          ? user.admin_password
+          : user.password,
       role: user.role,
-      user_limit: "",
+      user_limit: user.user_limit,
     });
 
     //     {
@@ -285,7 +207,9 @@ export function UserManagement() {
         });
         await fetchAdminAndUser();
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   const [showUserLimit, setShowUserLimit] = useState<any>("");
@@ -364,6 +288,7 @@ export function UserManagement() {
       }
     }
   };
+
   const handleDeleteAllEntriesByUser = async (userId: string) => {
     // deleteUser(userId);
 
@@ -389,9 +314,9 @@ export function UserManagement() {
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle>User Management</CardTitle>
+            <CardTitle>Admin Management</CardTitle>
             <CardDescription>
-              Manage users and their permissions
+              Manage Admins and their permissions
             </CardDescription>
           </div>
           {canCreateUsers && (
@@ -405,14 +330,14 @@ export function UserManagement() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add User
+                  Add Admin
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create New User</DialogTitle>
+                  <DialogTitle>Create New Admin</DialogTitle>
                   <DialogDescription>
-                    Add a new user to the system
+                    Add a new admin to the system
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -463,7 +388,7 @@ export function UserManagement() {
                     <Label htmlFor="role">Role</Label>
                     <Select
                       value={formData.role}
-                      onValueChange={(value: "user") => {
+                      onValueChange={(value: "admin") => {
                         setFormData({ ...formData, role: value });
                         setShowUserLimit(value);
                       }}
@@ -480,9 +405,28 @@ export function UserManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-
+                  {formData.role === "admin" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="user_limit">User limit</Label>
+                        {/* Removed Paste Button */}
+                      </div>
+                      <Input
+                        id="user_limit"
+                        type="number"
+                        value={formData.user_limit}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            user_limit: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                  )}
                   <Button type="submit" className="w-full">
-                    Create User
+                    Create Admin
                   </Button>
                 </form>
               </DialogContent>
@@ -499,86 +443,73 @@ export function UserManagement() {
                 <TableHead className="text-center">Name</TableHead>
                 <TableHead className="text-center">Username</TableHead>
                 <TableHead className="text-center">password</TableHead>
+                <TableHead className="text-center">User Create Limit</TableHead>
                 <TableHead className="text-center">
                   Total Entrires Created By Users
                 </TableHead>
                 <TableHead className="text-center">Role Name</TableHead>
-                <TableHead className="text-center">Created By</TableHead>
+                <TableHead className="text-center">User Count</TableHead>
                 <TableHead className="text-center">Created Date</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
-                <TableHead className="text-center">
-                  Delete All Entries
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {AdminData?.direct_superadmin_users?.users?.length > 0 ? (
-                AdminData.direct_superadmin_users?.users?.map(
-                  (user: any, idx: any) => (
-                    <TableRow key={idx}>
-                      <TableCell className="text-center">{idx + 1}</TableCell>
-                      <TableCell className="text-center">
-                        {user?.name}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {user?.username}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {user?.password}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {user?.record_count}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {user?.role}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {user?.created_by}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {new Date(user?.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-center justify-center">
-                        <div className="flex space-x-2 justify-center">
-                          <Button
-                            variant="outline"
-                            title="Download Excel"
-                            size="sm"
-                            onClick={() => handleDonwloadCSV(user)}
-                          >
-                            <FileDown color="green" size={23} />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            title="Edit User Details"
-                            onClick={() => handleEdit(user)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            title="Delete User"
-                            onClick={() => handleDelete(user?.admin_id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center justify-center">
+              {AdminData?.admins?.length > 0 ? (
+                AdminData.admins.map((user: any, idx: any) => (
+                  <TableRow key={idx}>
+                    <TableCell className="text-center">{idx + 1}</TableCell>
+                    <TableCell className="text-center">{user?.name}</TableCell>
+                    <TableCell className="text-center">
+                      {user?.username}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.admin_password}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.user_limit}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.total_records_created_by_users}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.role_name}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.user_count}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {new Date(user?.admin_created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-center justify-center">
+                      <div className="flex space-x-2 justify-center">
                         <Button
                           variant="outline"
                           size="sm"
-                          title="Delete All Entries For This User"
-                          onClick={() => handleDeleteAllEntriesByUser(user?.id)}
+                          title="View Admin Details"
+                          onClick={() => setViewUser(user)} //
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="Edit Admin Details"
+                          onClick={() => handleEdit(user)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="Delete Admin And All Users Details"
+                          onClick={() => handleDelete(user?.admin_id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-                )
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center">
@@ -635,13 +566,13 @@ export function UserManagement() {
                           <Eye className="h-4 w-4" />
                         </Button> */}
 
-                        {/* <Button
+                        <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleDonwloadCSV(user)}
                         >
                           <FileDown color="green" size={23} />
-                        </Button> */}
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -701,7 +632,6 @@ export function UserManagement() {
 
                       <TableHead className="text-center">User Count</TableHead>
                       <TableHead className="text-center">Created At</TableHead>
-                      <TableHead className="text-center">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -732,15 +662,6 @@ export function UserManagement() {
                           viewUser.admin_created_at
                         ).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDonwloadCSV(viewUser?.admin_id)}
-                        >
-                          <FileDown color="green" size={23} />
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -770,6 +691,9 @@ export function UserManagement() {
                         <TableHead className="text-center">
                           Download Excel
                         </TableHead>
+                        <TableHead className="text-center">
+                          Delete All Entries
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -794,7 +718,8 @@ export function UserManagement() {
                           <TableCell className="text-center">
                             {new Date(u.created_at).toLocaleDateString()}
                           </TableCell>
-                          <TableCell className="text-center">
+
+                          <TableCell className="text-center justify-center">
                             <Button
                               variant="outline"
                               size="sm"
@@ -802,6 +727,19 @@ export function UserManagement() {
                               onClick={() => handleDonwloadCSV(u)}
                             >
                               <FileDown color="green" size={23} />
+                            </Button>
+                          </TableCell>
+
+                          <TableCell className="text-center justify-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              title="Delete All Entries For This User"
+                              onClick={() =>
+                                handleDeleteAllEntriesByUser(u?.id)
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -825,8 +763,8 @@ export function UserManagement() {
           >
             <DialogContent className="max-w-3xl">
               <DialogHeader>
-                <DialogTitle>Edit User</DialogTitle>
-                <DialogDescription>Update user information</DialogDescription>
+                <DialogTitle>Edit Admin</DialogTitle>
+                <DialogDescription>Update admin information</DialogDescription>
               </DialogHeader>
 
               {/* 🔧 Edit Form */}
@@ -867,9 +805,23 @@ export function UserManagement() {
                     required
                   />
                 </div>
+                {currentUser?.role === "superadmin" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-user-limit">User Limit</Label>
+                    <Input
+                      id="edit-user-limit"
+                      type="number"
+                      value={formData.user_limit}
+                      onChange={(e) =>
+                        setFormData({ ...formData, user_limit: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                )}
 
                 <Button type="submit" className="w-full">
-                  Update User
+                  Update Admin
                 </Button>
               </form>
 

@@ -14,6 +14,8 @@ import {
   Sun,
   ChevronLeft,
   ChevronRight,
+  Shield,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +29,6 @@ export function Sidebar() {
     logout();
     router.push("/");
   };
-
   const menuItems = [
     {
       icon: LayoutDashboard,
@@ -35,6 +36,14 @@ export function Sidebar() {
       href: "/dashboard",
       roles: ["superadmin", "admin", "user"],
     },
+
+    {
+      icon: UserCog,
+      label: "Admin Management",
+      href: "/admins",
+      roles: ["superadmin"],
+    },
+
     {
       icon: Users,
       label: "User Management",
@@ -46,7 +55,7 @@ export function Sidebar() {
       icon: FileText,
       label: "Add Entry",
       href: "/entries/create",
-      roles: ["superadmin", "admin", "user"],
+      roles: ["superadmin", "user"],
     },
     {
       icon: FileText,
@@ -59,7 +68,7 @@ export function Sidebar() {
       icon: Settings,
       label: "Settings",
       href: "/settings",
-      roles: ["superadmin", "admin","user"],
+      roles: ["superadmin", "admin", "user"],
     },
   ];
 
@@ -82,7 +91,7 @@ export function Sidebar() {
               <img
                 src="/images/logo.png"
                 alt="Global Hub"
-                className="h-8 w-auto brightness-0 invert"
+                className="h-1/2 w-auto brightness-0 invert"
               />
             </div>
           )}

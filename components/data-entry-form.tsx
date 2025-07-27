@@ -38,7 +38,12 @@ export function DataEntryForm() {
 
   const router = useRouter();
 
-  const userEntries = currentUser?.role === "user" ? dataEntries : [];
+  const userEntries =
+    currentUser?.role === "user" ||
+    currentUser?.role === "superadmin" ||
+    currentUser?.role === "admin"
+      ? dataEntries
+      : [];
 
   const fetchDataEntries = useAuthStore((state) => state.fetchDataEntries);
 
@@ -145,9 +150,11 @@ export function DataEntryForm() {
             <Table>
               <TableHeader className="bg-gray-50 dark:bg-gray-800">
                 <TableRow>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">
-                    Actions
-                  </TableHead>
+                  {currentUser?.role !== "admin" && (
+                    <TableHead className=" min-w-[200px] max-w-[300px]">
+                      Actions
+                    </TableHead>
+                  )}
 
                   <TableHead className=" min-w-[200px] max-w-[300px]">
                     Record No
@@ -282,29 +289,30 @@ export function DataEntryForm() {
                       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       {/* Actions */}
-                      <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              router.push(`/entries/${entry?.id}/edit`)
-                            }
-                            className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(entry?.id)}
-                            className="hover:bg-red-50 hover:border-red-300 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-
+                      {currentUser?.role !== "admin" && (
+                        <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                router.push(`/entries/${entry?.id}/edit`)
+                              }
+                              className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDelete(entry?.id)}
+                              className="hover:bg-red-50 hover:border-red-300 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                       {/* Personal Info */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {entry?.record_no}

@@ -1,42 +1,45 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Dashboard } from "@/components/dashboard"
-import { Sidebar } from "@/components/layout/sidebar"
-import { Header } from "@/components/layout/header"
-import { useAuthStore } from "@/stores/auth-store"
-import { useThemeStore } from "@/stores/theme-store"
-import { AdminDashboard } from "@/components/admin-dashboard"
-import { SuperAdminDashboard } from "@/components/super-admin-dashboard"
-import { cn } from "@/lib/utils"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Dashboard } from "@/components/dashboard";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Header } from "@/components/layout/header";
+import { useAuthStore } from "@/stores/auth-store";
+import { useThemeStore } from "@/stores/theme-store";
+import { AdminDashboard } from "@/components/admin-dashboard";
+import { SuperAdminDashboard } from "@/components/super-admin-dashboard";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const currentUser = useAuthStore((state) => state.currentUser)
-  const { sidebarCollapsed } = useThemeStore()
-  const router = useRouter()
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const { sidebarCollapsed } = useThemeStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (!currentUser) {
-      router.push("/")
+      router.push("/");
     }
-  }, [currentUser, router])
+  }, [currentUser, router]);
 
   // if (!currentUser) {
   //   return <div>Loading...</div>
   // }
 
   const renderDashboard = () => {
-    console.log('currentUser?.role: ', currentUser?.role);
+    console.log("currentUser?.role: ", currentUser?.role);
     switch (currentUser?.role) {
       case "superadmin":
-        return <SuperAdminDashboard />
+        return <SuperAdminDashboard />;
       case "admin":
-        return <AdminDashboard />
+        return <AdminDashboard />;
+
+      case "user":
+        return <Dashboard />;
       default:
-        return <Dashboard />
+        return <></>;
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -44,7 +47,7 @@ export default function DashboardPage() {
       <div
         className={cn(
           "flex-1 flex flex-col overflow-hidden transition-all duration-300",
-          sidebarCollapsed ? "ml-0" : "ml-0",
+          sidebarCollapsed ? "ml-0" : "ml-0"
         )}
       >
         <Header />
@@ -55,7 +58,8 @@ export default function DashboardPage() {
                 Dashboard
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-200">
-                Welcome back, {currentUser?.name}. Here's what's happening today.
+                Welcome back, {currentUser?.name}. Here's what's happening
+                today.
               </p>
             </div>
             {renderDashboard()}
@@ -63,5 +67,5 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

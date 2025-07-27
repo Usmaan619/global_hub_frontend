@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuthStore } from "@/stores/auth-store";
-import { Download, Users, FileText, UserCheck, BarChart3 } from "lucide-react";
+import { Download, Users, FileText, UserCheck, BarChart3, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 import { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import axios from "axios";
 
 export function Dashboard() {
   const {
@@ -247,8 +248,90 @@ export function Dashboard() {
     })
   );
   console.log("userDailyData: ", userDailyData);
+
+  const handleDonwloadCSV = async (user_id: any) => {
+    if (!user_id) {
+      toast({
+        title: "Invalid User",
+        description: "User ID is missing or invalid.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${user_id}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `user_${currentUser?.name}_records.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error: any) {
+      if (error.response && error.response.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const result = JSON.parse(reader.result as string);
+            console.log("result: ", result);
+            toast({
+              title: "Download Failed",
+              description: result.message || "No records found for this user.",
+              variant: "destructive",
+            });
+          } catch {
+            toast({
+              title: "Download Failed",
+              description: "Unable to parse error response.",
+              variant: "destructive",
+            });
+          }
+        };
+        reader.readAsText(error.response.data);
+      } else {
+        toast({
+          title: "Download Error",
+          description: "Something went wrong while downloading the file.",
+          variant: "destructive",
+        });
+      }
+
+      console.error("Download error:", error);
+    }
+  };
   return (
     <div className="space-y-6">
+      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white p-6 rounded-xl shadow-lg">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">User Dashboard</h2>
+            <p className="text-blue-100">
+              Access your personal dashboard and manage your activities.
+            </p>
+          </div>
+
+          {/* <Button
+            onClick={() => handleDonwloadCSV(currentUser?.id)}
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+          >
+            <FileDown className="h-4 w-4 mr-2" />
+            Download Excel
+          </Button> */}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {currentUser?.role !== "user" && (
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">

@@ -64,6 +64,7 @@ export default function CreateEntryPage() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const topRef = useRef(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +93,14 @@ export default function CreateEntryPage() {
     if (res?.success) {
       showToast("Entry created", "Data entry has been created successfully.");
       resetForm();
+
+      if (topRef.current) {
+        // topRef.current.scrollTop = 0;
+        topRef.current.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
     }
   };
 
@@ -154,6 +163,7 @@ export default function CreateEntryPage() {
                 selectedImage={selectedImage}
                 setSelectedImage={setSelectedImage}
                 fileInputRef={fileInputRef}
+                topRef={topRef}
               />
             </form>
           </div>

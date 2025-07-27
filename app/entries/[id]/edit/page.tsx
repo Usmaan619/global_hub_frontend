@@ -22,7 +22,7 @@ export default function EditEntryPage() {
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
   const params = useParams();
-  
+
   const entryId = params.id as string;
 
   const [formData, setFormData] = useState<FormData>({
@@ -66,17 +66,16 @@ export default function EditEntryPage() {
   const [loading, setLoading] = useState(true);
   const [entryFound, setEntryFound] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const topRef = useRef(null);
 
   useEffect(() => {
-    
-    
     if (entryId) {
       const entryToEdit = dataEntries.find(
         (entry) => parseInt(entry.id) === parseInt(entryId)
       );
       if (entryToEdit) {
-        console.log('entryToEdit:======= ', entryToEdit);
-        
+        console.log("entryToEdit:======= ", entryToEdit);
+
         // Destructure to exclude id, userId, createdAt, updatedAt
         const { id, user_id, created_at, updated_at, ...rest } = entryToEdit;
         setFormData(rest);
@@ -95,7 +94,7 @@ export default function EditEntryPage() {
     setLoading(false);
   }, [entryId, dataEntries, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentUser) {
@@ -107,9 +106,17 @@ export default function EditEntryPage() {
       return;
     }
 
-    
-    updateDataEntry(entryId, formData);
-    
+    const res = await updateDataEntry(entryId, formData);
+    if (res) {
+      if (topRef.current) {
+        // topRef.current.scrollTop = 0;
+        topRef.current.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+    }
+
     // toast({
     //   title: "Entry updated",
     //   description: "Data entry has been updated successfully.",
@@ -163,6 +170,7 @@ export default function EditEntryPage() {
                 selectedImage={selectedImage}
                 setSelectedImage={setSelectedImage}
                 fileInputRef={fileInputRef}
+                topRef={topRef}
               />
               {/* <Button
                 type="submit"

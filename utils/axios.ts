@@ -9,9 +9,9 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = token;
     }
     return config;
   },
@@ -21,13 +21,18 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log("error: ", error);
     // Example: Redirect to login if 401
-    // if (error.response?.status === 401) {
-    //   if (typeof window !== "undefined") {
-    //     localStorage.removeItem("token");
-    //     window.location.href = "/login";
-    //   }
-    // }
+    // Forbidden: Invalid token
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.message === "Forbidden: Invalid token"
+    ) {
+      if (typeof window !== "undefined") {
+        sessionStorage.clear();
+        window.location.href = "/";
+      }
+    }
     return Promise.reject(error);
   }
 );

@@ -9,6 +9,7 @@ import { Upload } from "lucide-react"; // Removed Copy icon
 import { toast } from "@/hooks/use-toast";
 import type { DataEntry } from "@/stores/auth-store"; // Import DataEntry type
 import { useParams } from "next/navigation";
+import { useRef } from "react";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
 type FormData = Omit<DataEntry, "id" | "user_id" | "created_at" | "updated_at">;
@@ -27,7 +28,9 @@ export function DataEntryFormFields({
   selectedImage,
   setSelectedImage,
   fileInputRef,
+  topRef,
 }: DataEntryFormFieldsProps) {
+  console.log("topRef:DataEntryFormFieldsProps ", topRef);
   const params = useParams();
 
   const entryId = params.id as string;
@@ -149,7 +152,10 @@ export function DataEntryFormFields({
       </div>
 
       {/* Form Fields Section - Scrollable on md and larger screens */}
-      <div className="flex-1 space-y-6 md:overflow-y-auto md:pr-4 md:max-h-[calc(100vh-200px)]">
+      <div
+        className="flex-1 space-y-6 md:overflow-y-auto md:pr-4 md:max-h-[calc(100vh-200px)]"
+        ref={topRef}
+      >
         {" "}
         {/* Adjust max-h as needed */}
         {/* Personal Information */}
@@ -622,6 +628,7 @@ export function DataEntryFormFields({
         <div className="flex justify-end">
           <Button
             type="submit"
+            id="createEntryId"
             className="w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
           >
             {entryId ? "Save Entry" : "Create Entry"}
