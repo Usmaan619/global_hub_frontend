@@ -908,6 +908,8 @@ interface AuthState {
   currentUser: User | null;
   token: string | null;
   users: User[];
+  session: string | null; // Added session to store
+  // session: string | null; // Added session to store
   dataEntries: DataEntry[];
   AdminData: any;
   PortalLock: any;
@@ -915,7 +917,7 @@ interface AuthState {
 
   restoreSession: () => void;
 
-  setUserAndToken: (user: User, token: string) => void;
+  setUserAndToken: (user: User, token: string, session: string) => void;
   login: (userName: string, password: string) => boolean;
   logout: () => void;
 
@@ -957,25 +959,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   AdminData: null,
   DashboardData: null,
   PortalLock: null,
+  session: null,
 
-  setUserAndToken: (user, token) => {
+  setUserAndToken: (user, token, session) => {
     sessionStorage.setItem("token", token);
+    sessionStorage.setItem("session", session);
     sessionStorage.setItem("currentUser", JSON.stringify(user));
-    set({ currentUser: user, token });
+    set({ currentUser: user, token, session });
   },
 
   restoreSession: () => {
     const token = sessionStorage.getItem("token");
+    const session = sessionStorage.getItem("session");
     const userStr = sessionStorage.getItem("currentUser");
 
-    if (token && userStr) {
+    if (token && userStr && session) {
       const user = JSON.parse(userStr);
-      set({ token, currentUser: user });
+      set({ token, currentUser: user, session });
     }
   },
 
   logout: () => {
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("session");
     sessionStorage.removeItem("currentUser");
     set({ currentUser: null, token: null });
   },
@@ -999,7 +1005,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: (userName: string, password: string) => {
     const user = get().users.find((u) => u.userName === userName);
     if (user && password === "123") {
-      get().setUserAndToken(user, "demo-token");
+      get().setUserAndToken(user, "demo-token", "demo-session");
       return true;
     }
     return false;

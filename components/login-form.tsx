@@ -183,8 +183,8 @@ export function LoginForm() {
         return;
       }
 
-      // Save user & token in Zustand + sessionStorage
-      setUserAndToken(user, res.token);
+      // Save user & token, session in Zustand + sessionStorage
+      setUserAndToken(user, res.token, res.session);
 
       // Redirect by role
       if (res.role === "admin") {
@@ -223,9 +223,7 @@ export function LoginForm() {
                 alt="Global Hub - Business Process Outsourcing"
                 className="h-20 mx-auto mb-4"
               />
-              <h1 className="text-2xl font-bold mb-2">
-                Data Entry Portal
-              </h1>
+              <h1 className="text-2xl font-bold mb-2">Data Entry Portal</h1>
               <p className="">
                 Secure access to your business data management system
               </p>
