@@ -914,6 +914,7 @@ interface AuthState {
   AdminData: any;
   PortalLock: any;
   DashboardData: any;
+  entryId: any;
 
   restoreSession: () => void;
 
@@ -946,7 +947,9 @@ interface AuthState {
   fetchLockStatus: () => Promise<void>;
 
   setToken: (token: string | null) => void;
+
   setCurrentUser: (user: User | null) => void;
+  setDataEntryId: (id: string) => void;
 }
 
 // ---------- Store Setup ----------
@@ -960,6 +963,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   DashboardData: null,
   PortalLock: null,
   session: null,
+  entryId: null,
 
   setUserAndToken: (user, token, session) => {
     sessionStorage.setItem("token", token);
@@ -995,6 +999,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ token });
   },
 
+  setDataEntryId: (id) => set({ entryId: id }),
   setCurrentUser: (user) => set({ currentUser: user }),
 
   // setUserAndToken: (user, token) => {

@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuthStore, type DataEntry } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
@@ -18,13 +18,22 @@ import { cn } from "@/lib/utils";
 type FormData = Omit<DataEntry, "id" | "user_id" | "created_at" | "updated_at">;
 
 export default function EditEntryPage() {
-  const { currentUser, dataEntries, updateDataEntry } = useAuthStore();
+  const { currentUser, dataEntries, updateDataEntry, entryId } = useAuthStore();
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
+  // console.log('router: ', router?.query);
   const params = useParams();
+  console.log("router: ", router);
 
-  const entryId = params.id as string;
+  // const { id } = router?.query;
+  // console.log('id:---------------------- ', id);
 
+  //  const searchParams = useSearchParams();
+  // const id = searchParams.get('id');;
+  // console.log("------------------id: ", id);
+
+  // const entryId = params.id as string;
+  // const entryId = id as string;
   const [formData, setFormData] = useState<FormData>({
     image: "",
     admin_id: "",

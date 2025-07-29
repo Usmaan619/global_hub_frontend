@@ -32,6 +32,7 @@ export function DataEntryForm() {
     deleteDataEntry,
     getDataEntriesByUser,
     users,
+    setDataEntryId,
   } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
   console.log("dataEntries: ", dataEntries);
@@ -295,9 +296,10 @@ export function DataEntryForm() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                router.push(`/entries/${entry?.id}/edit`)
-                              }
+                              onClick={() => {
+                                router.push(`/entries/edit`);
+                                setDataEntryId(entry?.id);
+                              }}
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
                               <Edit className="h-4 w-4" />
