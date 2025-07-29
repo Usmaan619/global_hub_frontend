@@ -4,6 +4,7 @@ import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "Global Hub",
+  icons: "favicon.png",
   description:
     "Data Entry Portal Secure access to your business data management system",
 };
