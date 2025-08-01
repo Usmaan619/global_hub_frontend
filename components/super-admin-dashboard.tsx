@@ -102,10 +102,7 @@ export function SuperAdminDashboard() {
     };
   });
 
-  console.log(
-    "super admin-------------------------------DashboardData: ",
-    DashboardData
-  );
+  
   //   {
   //     "success": true,
   //     "total_admins": 1,

@@ -30,7 +30,7 @@ export function DataEntryFormFields({
   fileInputRef,
   topRef,
 }: DataEntryFormFieldsProps) {
-  console.log("topRef:DataEntryFormFieldsProps ", topRef);
+  
   const params = useParams();
 
   const entryId = params.id as string;
@@ -109,9 +109,9 @@ export function DataEntryFormFields({
       {/* Image Section - Fixed on md and larger screens */}
       <div className="md:w-1/3 flex-shrink-0 space-y-4">
         <Label>Image</Label>
-        <div className="border-2  border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[600px] flex flex-col justify-center items-center">
+        <div className="border-2  border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[550px] w-10/12 flex flex-col justify-center items-center">
           {selectedImage ? (
-            <div className="relative group w-full h-full flex items-center justify-center">
+            <div className="relative group w-10/12 h-full flex items-center justify-center">
               <img
                 src={selectedImage || "/placeholder.svg"}
                 alt="Preview"
@@ -180,7 +180,7 @@ export function DataEntryFormFields({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="lead_no">
-                  Lead No <span className="text-red-500">*</span>
+                  Lead Id <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input

@@ -59,7 +59,9 @@ import axios from "axios";
 
 // Create Axios instance
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://13.202.180.10/api/global_hub", // e.g., http://localhost:4000/api
+  baseURL: "https://api.globalhub-bpo.com/api/global_hub",
+  // || process.env.NEXT_PUBLIC_API_BASE_URL || "http://13.202.180.10/api/global_hub",
+  // e.g., http://localhost:4000/api
 });
 
 // Request Interceptor: Attach token and session headers

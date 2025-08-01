@@ -34,10 +34,6 @@ export function Dashboard() {
     fetchCountAdminAndUser,
     DashboardData,
   } = useAuthStore();
-  console.log(
-    "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppDashboardData: ",
-    DashboardData
-  );
 
   useEffect(() => {
     const fetchCountAdminAndUserApi = async () =>
@@ -247,7 +243,7 @@ export function Dashboard() {
       entries: item.record_count, // Y axis
     })
   );
-  console.log("userDailyData: ", userDailyData);
+  
 
   const handleDonwloadCSV = async (user_id: any) => {
     if (!user_id) {
@@ -261,7 +257,7 @@ export function Dashboard() {
 
     try {
       const response = await axios.get(
-        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${user_id}`,
+        `https://api.globalhub-bpo.com/api/global_hub/download/csv/user/by/id?user_id=${user_id}`,
         {
           responseType: "blob",
         }
@@ -285,7 +281,7 @@ export function Dashboard() {
         reader.onload = () => {
           try {
             const result = JSON.parse(reader.result as string);
-            console.log("result: ", result);
+            
             toast({
               title: "Download Failed",
               description: result.message || "No records found for this user.",
@@ -308,7 +304,7 @@ export function Dashboard() {
         });
       }
 
-      console.error("Download error:", error);
+      
     }
   };
   return (

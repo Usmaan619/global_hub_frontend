@@ -58,7 +58,7 @@ export function AmdinManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
 
-  console.log("AdminData: ", AdminData);
+  
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -208,7 +208,7 @@ export function AmdinManagement() {
         await fetchAdminAndUser();
       }
     } catch (error) {
-      console.log("error: ", error);
+      
     }
   };
 
@@ -240,7 +240,7 @@ export function AmdinManagement() {
 
     try {
       const response = await axios.get(
-        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${user.id}`,
+        `https://api.globalhub-bpo.com/api/global_hub/download/csv/user/by/id?user_id=${user.id}`,
         {
           responseType: "blob",
         }
@@ -295,7 +295,7 @@ export function AmdinManagement() {
     try {
       if (currentUser?.role === "superadmin") {
         const res = await deleteData(`/delete/all/record/by/user/id/${userId}`);
-        console.log("res: ", res);
+        
 
         if (res?.success) {
           toast({
@@ -306,7 +306,7 @@ export function AmdinManagement() {
         }
       }
     } catch (error) {
-      console.log("error: ", error);
+      
     }
   };
   return (

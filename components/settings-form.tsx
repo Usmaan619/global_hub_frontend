@@ -32,7 +32,7 @@ export function SettingsForm() {
     useAuthStore();
   const { theme, toggleTheme, sidebarCollapsed, toggleSidebar } =
     useThemeStore();
-  console.log("PortalLock: ", PortalLock);
+
   const [lockPortal, setLockPortal] = useState<any>(PortalLock);
 
   useEffect(() => {
@@ -55,7 +55,6 @@ export function SettingsForm() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  console.log("lockPortal: ", lockPortal);
 
   const handleLockPortal = async (checked: any) => {
     try {
@@ -64,28 +63,15 @@ export function SettingsForm() {
         const response = await postData("lock-status/toggle", {
           disabled: checked,
         });
-        console.log("response:==================lock-status/toggle ", response);
+
         if (response?.success) {
         }
-      } catch (error) {
-        console.error("Create data entry error:", error);
-      }
-    } catch (error) {
-      console.log("error: ", error);
-    }
+      } catch (error) {}
+    } catch (error) {}
   };
 
   const handleSaveChanges = async () => {
     // Simulate API call for saving changes
-    // In a real app, you would send this data to your backend
-    console.log("Saving changes:", {
-      userName,
-      language,
-      timezone,
-      emailNotifications,
-      pushNotifications,
-      notificationSound,
-    });
 
     if (currentUser) {
       try {
@@ -128,7 +114,7 @@ export function SettingsForm() {
       return;
     }
     // Simulate password change
-    console.log("Changing password:", { currentPassword, newPassword });
+
     toast({
       title: "Password Changed",
       description: "Your password has been updated successfully.",
@@ -140,7 +126,7 @@ export function SettingsForm() {
 
   const handleDeleteAccount = () => {
     // In a real app, this would trigger a confirmation dialog and then an API call
-    console.log("Deleting account...");
+
     toast({
       title: "Account Deletion Initiated",
       description:

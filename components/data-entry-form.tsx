@@ -35,7 +35,7 @@ export function DataEntryForm() {
     setDataEntryId,
   } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
-  console.log("dataEntries: ", dataEntries);
+  
 
   const router = useRouter();
 
@@ -61,7 +61,7 @@ export function DataEntryForm() {
     );
   }, [userEntries, searchTerm]);
 
-  console.log("filteredEntries: ", filteredEntries);
+  
 
   // Removed handleCopy function
 
@@ -69,7 +69,7 @@ export function DataEntryForm() {
     setSearchTerm("");
   };
 
-  console.log("users: ", users);
+  
   const getUserName = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user?.name || "Unknown User";
@@ -161,7 +161,7 @@ export function DataEntryForm() {
                     Record No
                   </TableHead>
                   <TableHead className=" min-w-[200px] max-w-[300px]">
-                    Lead No
+                    Lead Id
                   </TableHead>
                   <TableHead className=" min-w-[200px] max-w-[300px]">
                     Applicant First Name

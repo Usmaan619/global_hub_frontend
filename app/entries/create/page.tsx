@@ -85,6 +85,8 @@ export default function CreateEntryPage() {
       );
       return;
     }
+
+    formData.image = "text";
     const res = await createDataEntry({
       ...formData,
       user_id: currentUser.id,

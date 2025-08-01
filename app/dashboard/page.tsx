@@ -27,7 +27,7 @@ export default function DashboardPage() {
   // }
 
   const renderDashboard = () => {
-    console.log("currentUser?.role: ", currentUser?.role);
+    
     switch (currentUser?.role) {
       case "superadmin":
         return <SuperAdminDashboard />;

@@ -70,10 +70,7 @@ export function AdminDashboard() {
     return null;
   }
 
-  console.log(
-    "Admin----------------------------------------------DashboardData: ",
-    DashboardData
-  );
+
 
   const myUsers = getUsersByAdmin(currentUser.id);
   const user_ids = myUsers?.map((u) => u.id);
@@ -186,7 +183,7 @@ export function AdminDashboard() {
   const handleDonwloadCSV = async (u: any) => {
     try {
       const response = await axios.get(
-        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
+        `https://api.globalhub-bpo.com/api/global_hub/download/csv/user/by/id?user_id=${u?.id}`,
         {
           responseType: "blob", // 👈 VERY important
         }

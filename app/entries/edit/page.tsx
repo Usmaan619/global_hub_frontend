@@ -21,16 +21,16 @@ export default function EditEntryPage() {
   const { currentUser, dataEntries, updateDataEntry, entryId } = useAuthStore();
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
-  // console.log('router: ', router?.query);
+  // 
   const params = useParams();
-  console.log("router: ", router);
+  
 
   // const { id } = router?.query;
-  // console.log('id:---------------------- ', id);
+  // 
 
   //  const searchParams = useSearchParams();
   // const id = searchParams.get('id');;
-  // console.log("------------------id: ", id);
+  // 
 
   // const entryId = params.id as string;
   // const entryId = id as string;
@@ -83,7 +83,7 @@ export default function EditEntryPage() {
         (entry) => parseInt(entry.id) === parseInt(entryId)
       );
       if (entryToEdit) {
-        console.log("entryToEdit:======= ", entryToEdit);
+        
 
         // Destructure to exclude id, userId, createdAt, updatedAt
         const { id, user_id, created_at, updated_at, ...rest } = entryToEdit;

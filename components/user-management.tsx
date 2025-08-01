@@ -57,7 +57,7 @@ export function UserManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
 
-  console.log("AdminData: ", AdminData);
+  
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -177,9 +177,9 @@ export function UserManagement() {
     };
 
     const isSuperadmin = currentUser?.role === "superadmin";
-    console.log("isSuperadmin: ", isSuperadmin);
+    
     const isAdmin = currentUser?.role === "admin";
-    console.log("isAdmin: ", isAdmin);
+    
 
     try {
       if (editingUser) {
@@ -190,7 +190,7 @@ export function UserManagement() {
           password: formData.password,
         };
 
-        console.log("editingUser: ", editingUser);
+        
         if (isSuperadmin) {
           endpoint = `/update/user/by/id/${editingUser.id}`;
           payload.user_limit = formData.user_limit;
@@ -316,7 +316,7 @@ export function UserManagement() {
 
     try {
       const response = await axios.get(
-        `http://localhost:5002/api/global_hub/download/csv/user/by/id?user_id=${user.id}`,
+        `https://api.globalhub-bpo.com/api/global_hub/download/csv/user/by/id?user_id=${user.id}`,
         {
           responseType: "blob",
         }
@@ -370,7 +370,7 @@ export function UserManagement() {
     try {
       if (currentUser?.role === "superadmin") {
         const res = await deleteData(`/delete/all/record/by/user/id/${userId}`);
-        console.log("res: ", res);
+        
 
         if (res?.success) {
           toast({
@@ -381,7 +381,7 @@ export function UserManagement() {
         }
       }
     } catch (error) {
-      console.log("error: ", error);
+      
     }
   };
   return (

@@ -196,7 +196,7 @@
 //           });
 //           return false;
 //         }
-//         console.log("userData: ", userData);
+//         
 //         const payload = {
 //           name: userData.name,
 //           username: userData.userName,
@@ -212,7 +212,7 @@
 
 //         try {
 //           const response = await postData("/auth/register", payload);
-//           console.log("response: ", response);
+//           
 
 //           if (response?.success) {
 //             toast({
@@ -245,7 +245,7 @@
 //           //   return false;
 //           // }
 //         } catch (error) {
-//           console.error("Create user API error:", error);
+//           
 //           toast({
 //             title: "Server Error",
 //             description: "Failed to create user due to server error.",
@@ -272,7 +272,7 @@
 //       createDataEntry: async (
 //         entryData: Omit<DataEntry, "id" | "createdAt" | "updatedAt">
 //       ) => {
-//         console.log("entryData: ", entryData);
+//         
 //         const useBackend = true;
 
 //         // 🛠️ camelCase to snake_case converter
@@ -311,7 +311,7 @@
 
 //           // Convert to snake_case
 //           const payload = camelToSnake(entryData);
-//           console.log("payload:============= ", payload);
+//           
 
 //           //  Replace with your actual postData helper
 //           const response = await postData("/create/record", payload);
@@ -321,7 +321,7 @@
 
 //           return { success: true };
 //         } catch (error) {
-//           console.error("Create data entry error:", error);
+//           
 //           return { success: false };
 //         }
 //       },
@@ -341,7 +341,7 @@
 //         try {
 //           const res = await postData(`update/record/by/id/${id}`, entryData);
 
-//           console.log("Fetched entries: ", res?.record);
+//           
 //           if (res?.result) {
 //             toast({
 //               title: "Entry updated",
@@ -361,7 +361,7 @@
 //             }));
 //           }
 //         } catch (error) {
-//           console.error("Failed to update data entry:", error);
+//           
 //           toast({
 //             title: "Update failed",
 //             description: "Server did not return updated record.",
@@ -377,12 +377,12 @@
 //       },
 
 //       getUsersByAdmin: (adminId: string) => {
-//         console.log("adminId: ", adminId);
+//         
 //         return get().users.filter((user) => user?.createdBy === adminId);
 //       },
 
 //       getUsersByAdminApi: async (adminId: string) => {
-//         console.log("adminId: ", adminId);
+//         
 //         await get().fetchAdminAndUser(); // Await to ensure users are fetched before filtering
 //         return get().users.filter((user) => user?.createdBy === adminId);
 //       },
@@ -406,14 +406,14 @@
 //             );
 //           }
 
-//           console.log("Fetched entries:======= ", res);
+//           
 
 //           //  Set fetched users into state
 //           if (res?.success && res?.user) {
 //             set({ AdminData: res.user?.data });
 //           }
 //         } catch (error) {
-//           console.error("Failed to fetch data entries:", error);
+//           
 //         }
 //       },
 
@@ -425,15 +425,15 @@
 //         const { currentUser } = get();
 //         // if (!currentUser || currentUser.role !== "superadmin") return;
 
-//         console.log("currentUser.id: fetchDataEntries", currentUser?.id);
+//         
 //         try {
 //           const res = await getData(`get/all/records?id=${currentUser?.id}`);
-//           console.log("Fetched entries: auth", res?.record);
+//           
 //           if (res?.record) {
 //             set({ dataEntries: res?.record });
 //           }
 //         } catch (error) {
-//           console.error("Failed to fetch data entries:", error);
+//           
 //         }
 //       },
 
@@ -454,14 +454,14 @@
 //           if (currentUser.role === "user")
 //             res = await getData(`static/dashboard?user_id=${currentUser.id}`);
 
-//           console.log("Fetched entries:======= ", res);
+//           
 
 //           //  Set fetched users into state
 //           if (res?.success) {
 //             set({ DashboardData: res });
 //           }
 //         } catch (error) {
-//           console.error("Failed to fetch data entries:", error);
+//           
 //         }
 //       },
 
@@ -471,7 +471,7 @@
 //           set({ PortalLock: res?.disabled });
 //           return res?.disabled;
 //         } catch (error) {
-//           console.error("Failed to fetch data entries:", error);
+//           
 //         }
 //       },
 //     }),
@@ -672,7 +672,7 @@
 //         return false;
 //       }
 //     } catch (error) {
-//       console.error("Create user API error:", error);
+//       
 //       toast({
 //         title: "Server Error",
 //         description: "Failed to create user due to server error.",
@@ -723,7 +723,7 @@
 //       set({ dataEntries: [...dataEntries, newEntry] });
 //       return { success: true };
 //     } catch (error) {
-//       console.error("Create data entry error:", error);
+//       
 //       return { success: false };
 //     }
 //   },
@@ -746,7 +746,7 @@
 //         }));
 //       }
 //     } catch (error) {
-//       console.error("Failed to update data entry:", error);
+//       
 //       toast({
 //         title: "Update failed",
 //         description: "Server did not return updated record.",
@@ -782,7 +782,7 @@
 //         set({ dataEntries: res?.record });
 //       }
 //     } catch (error) {
-//       console.error("Failed to fetch data entries:", error);
+//       
 //     }
 //   },
 
@@ -806,7 +806,7 @@
 //         set({ AdminData: res.user?.data });
 //       }
 //     } catch (error) {
-//       console.error("Failed to fetch users:", error);
+//       
 //     }
 //   },
 
@@ -827,7 +827,7 @@
 //         set({ DashboardData: res });
 //       }
 //     } catch (error) {
-//       console.error("Failed to fetch dashboard data:", error);
+//       
 //     }
 //   },
 
@@ -837,7 +837,7 @@
 //       set({ PortalLock: res?.disabled });
 //       return res?.disabled;
 //     } catch (error) {
-//       console.error("Failed to fetch lock status:", error);
+//       
 //     }
 //   },
 // }));
@@ -1076,7 +1076,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       return false;
     } catch (error) {
-      console.error("Create user API error:", error);
+      
       const err = error as any;
       toast({
         title: "Failed to create user",
@@ -1145,7 +1145,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return { success: true };
     } catch (error) {
-      console.error("Create data entry error:", error);
+      
       return { success: false };
     }
   },
@@ -1173,7 +1173,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return res;
       }
     } catch (error) {
-      console.error("Failed to update data entry:", error);
+      
       toast({
         title: "Update failed",
         description: "Server did not return updated record.",
@@ -1217,7 +1217,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ AdminData: res?.user?.data });
       }
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      
     }
   },
 
@@ -1237,7 +1237,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ dataEntries: res?.record });
       }
     } catch (error) {
-      console.error("Failed to fetch data entries:", error);
+      
     }
   },
 
@@ -1258,7 +1258,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ DashboardData: res });
       }
     } catch (error) {
-      console.error("Failed to fetch dashboard data:", error);
+      
     }
   },
 
@@ -1268,7 +1268,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ PortalLock: res?.disabled });
       return res?.disabled;
     } catch (error) {
-      console.error("Failed to fetch lock status:", error);
+      
     }
   },
 
@@ -1283,7 +1283,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   //     useAuthStore.getState().setToken(token);
   //   }
   // } catch (err) {
-  //   console.error("Failed to restore user session", err);
+  //   
   //   useAuthStore.getState().logout();
   // }
   // }
