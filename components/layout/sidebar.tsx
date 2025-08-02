@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Shield,
   UserCog,
+  FilePenIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +53,7 @@ export function Sidebar() {
     },
 
     {
-      icon: FileText,
+      icon: FilePenIcon,
       label: "Add Entry",
       href: "/entries/create",
       roles: ["superadmin", "user"],

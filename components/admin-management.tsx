@@ -36,13 +36,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
-import { deleteData, getData, postData } from "@/services/api";
+import { deleteData, postData } from "@/services/api";
 import axios from "axios";
-import { Tooltip } from "./ui/tooltip";
 
 export function AmdinManagement() {
   const {
@@ -57,8 +55,6 @@ export function AmdinManagement() {
   } = useAuthStore();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
-
-  
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -207,9 +203,7 @@ export function AmdinManagement() {
         });
         await fetchAdminAndUser();
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   const [showUserLimit, setShowUserLimit] = useState<any>("");
@@ -295,7 +289,6 @@ export function AmdinManagement() {
     try {
       if (currentUser?.role === "superadmin") {
         const res = await deleteData(`/delete/all/record/by/user/id/${userId}`);
-        
 
         if (res?.success) {
           toast({
@@ -305,9 +298,7 @@ export function AmdinManagement() {
           await fetchAdminAndUser();
         }
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
   return (
     <Card>
@@ -340,7 +331,11 @@ export function AmdinManagement() {
                     Add a new admin to the system
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                  spellCheck="false"
+                  onSubmit={handleSubmit}
+                  className="space-y-4"
+                >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="name">Name</Label>
@@ -768,7 +763,11 @@ export function AmdinManagement() {
               </DialogHeader>
 
               {/* 🔧 Edit Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form
+                spellCheck="false"
+                onSubmit={handleSubmit}
+                className="space-y-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="edit-name">Name</Label>
                   <Input

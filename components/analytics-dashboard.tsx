@@ -1,238 +1,279 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { useAuthStore } from "@/stores/auth-store"
+import { useState, useMemo } from "react";
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuthStore } from "@/stores/auth-store";
+import {
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   Area,
   AreaChart,
-} from "recharts"
-import { Calendar, TrendingUp, FileText, Users, Download, Filter } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+} from "recharts";
+import { TrendingUp, Download, Filter } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface AnalyticsProps {
-  userRole: "superadmin" | "admin" | "user"
+  userRole: "superadmin" | "admin" | "user";
 }
 
 export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
-  const { currentUser, users, dataEntries, getUsersByAdmin } = useAuthStore()
-  const [timeFilter, setTimeFilter] = useState<"monthly" | "yearly">("monthly")
-  const [userFilter, setUserFilter] = useState<string>("all")
-  const [adminFilter, setAdminFilter] = useState<string>("all")
+  const { currentUser, users, dataEntries, getUsersByAdmin } = useAuthStore();
+  const [timeFilter, setTimeFilter] = useState<"monthly" | "yearly">("monthly");
+  const [userFilter, setUserFilter] = useState<string>("all");
+  const [adminFilter, setAdminFilter] = useState<string>("all");
 
   // Get filtered data based on role and filters
   const getFilteredData = useMemo(() => {
-    let filteredEntries = dataEntries
-    let filteredUsers = users
+    let filteredEntries = dataEntries;
+    let filteredUsers = users;
 
     if (userRole === "admin" && currentUser) {
-      const adminUsers = getUsersByAdmin(currentUser.id)
-      const userIds = [currentUser.id, ...adminUsers.map((u) => u.id)]
-      filteredEntries = dataEntries.filter((entry) => userIds.includes(entry.userId))
-      filteredUsers = [currentUser, ...adminUsers]
+      const adminUsers = getUsersByAdmin(currentUser.id);
+      const userIds = [currentUser.id, ...adminUsers.map((u) => u.id)];
+      filteredEntries = dataEntries.filter((entry) =>
+        userIds.includes(entry.userId)
+      );
+      filteredUsers = [currentUser, ...adminUsers];
     } else if (userRole === "user" && currentUser) {
-      filteredEntries = dataEntries.filter((entry) => entry.userId === currentUser.id)
-      filteredUsers = [currentUser]
+      filteredEntries = dataEntries.filter(
+        (entry) => entry.userId === currentUser.id
+      );
+      filteredUsers = [currentUser];
     }
 
     // Apply additional filters
     if (userFilter !== "all") {
-      filteredEntries = filteredEntries.filter((entry) => entry.userId === userFilter)
+      filteredEntries = filteredEntries.filter(
+        (entry) => entry.userId === userFilter
+      );
     }
 
     if (adminFilter !== "all" && userRole === "superadmin") {
-      const adminUsers = getUsersByAdmin(adminFilter)
-      const userIds = adminUsers.map((u) => u.id)
-      filteredEntries = filteredEntries.filter((entry) => userIds.includes(entry.userId))
+      const adminUsers = getUsersByAdmin(adminFilter);
+      const userIds = adminUsers.map((u) => u.id);
+      filteredEntries = filteredEntries.filter((entry) =>
+        userIds.includes(entry.userId)
+      );
     }
 
-    return { filteredEntries, filteredUsers }
-  }, [userRole, currentUser, dataEntries, users, userFilter, adminFilter, getUsersByAdmin])
+    return { filteredEntries, filteredUsers };
+  }, [
+    userRole,
+    currentUser,
+    dataEntries,
+    users,
+    userFilter,
+    adminFilter,
+    getUsersByAdmin,
+  ]);
 
   // Generate time-based data
   const generateTimeData = useMemo(() => {
-    const { filteredEntries } = getFilteredData
-    const now = new Date()
-    const data: { [key: string]: number } = {}
+    const { filteredEntries } = getFilteredData;
+    const now = new Date();
+    const data: { [key: string]: number } = {};
 
     if (timeFilter === "monthly") {
       // Last 12 months
       for (let i = 11; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const key = date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
-        data[key] = 0
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = date.toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
+        data[key] = 0;
       }
 
       filteredEntries.forEach((entry) => {
-        const entryDate = new Date(entry.createdAt)
-        const key = entryDate.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+        const entryDate = new Date(entry.createdAt);
+        const key = entryDate.toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
         if (data.hasOwnProperty(key)) {
-          data[key]++
+          data[key]++;
         }
-      })
+      });
     } else {
       // Last 5 years
       for (let i = 4; i >= 0; i--) {
-        const year = now.getFullYear() - i
-        data[year.toString()] = 0
+        const year = now.getFullYear() - i;
+        data[year.toString()] = 0;
       }
 
       filteredEntries.forEach((entry) => {
-        const entryDate = new Date(entry.createdAt)
-        const year = entryDate.getFullYear().toString()
+        const entryDate = new Date(entry.createdAt);
+        const year = entryDate.getFullYear().toString();
         if (data.hasOwnProperty(year)) {
-          data[year]++
+          data[year]++;
         }
-      })
+      });
     }
 
     return Object.entries(data).map(([period, count]) => ({
       period,
       entries: count,
-    }))
-  }, [getFilteredData, timeFilter])
+    }));
+  }, [getFilteredData, timeFilter]);
 
   // User activity data
   const userActivityData = useMemo(() => {
-    const { filteredEntries, filteredUsers } = getFilteredData
+    const { filteredEntries, filteredUsers } = getFilteredData;
 
     return filteredUsers
       .map((user) => {
-        const userEntries = filteredEntries.filter((entry) => entry.userId === user.id)
+        const userEntries = filteredEntries.filter(
+          (entry) => entry.userId === user.id
+        );
         return {
           name: user.name,
           entries: userEntries.length,
           role: user.role,
-        }
+        };
       })
       .sort((a, b) => b.entries - a.entries)
-      .slice(0, 10)
-  }, [getFilteredData])
+      .slice(0, 10);
+  }, [getFilteredData]);
 
   // Recent activity
   const recentActivity = useMemo(() => {
-    const { filteredEntries } = getFilteredData
+    const { filteredEntries } = getFilteredData;
     return filteredEntries
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
       .slice(0, 10)
       .map((entry) => {
-        const user = users.find((u) => u.id === entry.userId)
+        const user = users.find((u) => u.id === entry.userId);
         return {
           ...entry,
           userName: user?.name || "Unknown User",
           userRole: user?.role || "unknown",
-        }
-      })
-  }, [getFilteredData, users])
+        };
+      });
+  }, [getFilteredData, users]);
 
   // Daily activity for the last 30 days
   const dailyActivityData = useMemo(() => {
-    const { filteredEntries } = getFilteredData
-    const last30Days: { [key: string]: number } = {}
-    const now = new Date()
+    const { filteredEntries } = getFilteredData;
+    const last30Days: { [key: string]: number } = {};
+    const now = new Date();
 
     for (let i = 29; i >= 0; i--) {
-      const date = new Date(now)
-      date.setDate(date.getDate() - i)
-      const key = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      last30Days[key] = 0
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const key = date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      last30Days[key] = 0;
     }
 
     filteredEntries.forEach((entry) => {
-      const entryDate = new Date(entry.createdAt)
-      const key = entryDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      const entryDate = new Date(entry.createdAt);
+      const key = entryDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
       if (last30Days.hasOwnProperty(key)) {
-        last30Days[key]++
+        last30Days[key]++;
       }
-    })
+    });
 
     return Object.entries(last30Days).map(([date, count]) => ({
       date,
       entries: count,
-    }))
-  }, [getFilteredData])
+    }));
+  }, [getFilteredData]);
 
   // Role distribution (for super admin)
   const roleDistributionData = useMemo(() => {
-    if (userRole !== "superadmin") return []
+    if (userRole !== "superadmin") return [];
 
-    const roleCounts = users.reduce(
-      (acc, user) => {
-        if (user.role !== "superadmin") {
-          acc[user.role] = (acc[user.role] || 0) + 1
-        }
-        return acc
-      },
-      {} as { [key: string]: number },
-    )
+    const roleCounts = users.reduce((acc, user) => {
+      if (user.role !== "superadmin") {
+        acc[user.role] = (acc[user.role] || 0) + 1;
+      }
+      return acc;
+    }, {} as { [key: string]: number });
 
     return Object.entries(roleCounts).map(([role, count]) => ({
       name: role.charAt(0).toUpperCase() + role.slice(1).replace("_", " "),
       value: count,
       color: role === "admin" ? "#3B82F6" : "#10B981",
-    }))
-  }, [users, userRole])
+    }));
+  }, [users, userRole]);
 
   const exportReport = () => {
-    const { filteredEntries } = getFilteredData
+    const { filteredEntries } = getFilteredData;
     const reportData = {
       summary: {
         totalEntries: filteredEntries.length,
         timeFilter,
         generatedAt: new Date().toISOString(),
-        userFilter: userFilter !== "all" ? users.find((u) => u.id === userFilter)?.name : "All Users",
+        userFilter:
+          userFilter !== "all"
+            ? users.find((u) => u.id === userFilter)?.name
+            : "All Users",
       },
       timeData: generateTimeData,
       userActivity: userActivityData,
       recentActivity: recentActivity.slice(0, 5),
-    }
+    };
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: "application/json" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `analytics-report-${timeFilter}-${new Date().toISOString().split("T")[0]}.json`
-    a.click()
-    window.URL.revokeObjectURL(url)
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `analytics-report-${timeFilter}-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
 
     toast({
       title: "Report exported",
       description: "Analytics report has been downloaded successfully.",
-    })
-  }
+    });
+  };
 
   const availableUsers = useMemo(() => {
     if (userRole === "superadmin") {
-      return users.filter((u) => u.role !== "superadmin")
+      return users.filter((u) => u.role !== "superadmin");
     } else if (userRole === "admin" && currentUser) {
-      return getUsersByAdmin(currentUser.id)
+      return getUsersByAdmin(currentUser.id);
     }
-    return []
-  }, [userRole, users, currentUser, getUsersByAdmin])
+    return [];
+  }, [userRole, users, currentUser, getUsersByAdmin]);
 
   const availableAdmins = useMemo(() => {
     if (userRole === "superadmin") {
-      return users.filter((u) => u.role === "admin")
+      return users.filter((u) => u.role === "admin");
     }
-    return []
-  }, [userRole, users])
+    return [];
+  }, [userRole, users]);
 
-  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"]
+  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
   return (
     <div className="space-y-6">
@@ -245,9 +286,14 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
                 <Filter className="h-5 w-5 text-blue-600" />
                 <span>Analytics & Reports</span>
               </CardTitle>
-              <CardDescription>Comprehensive data insights and reporting</CardDescription>
+              <CardDescription>
+                Comprehensive data insights and reporting
+              </CardDescription>
             </div>
-            <Button onClick={exportReport} className="bg-green-600 hover:bg-green-700">
+            <Button
+              onClick={exportReport}
+              className="bg-green-600 hover:bg-green-700"
+            >
               <Download className="h-4 w-4 mr-2" />
               Export Report
             </Button>
@@ -257,7 +303,12 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <label className="text-sm font-medium">Time Period:</label>
-              <Select value={timeFilter} onValueChange={(value: "monthly" | "yearly") => setTimeFilter(value)}>
+              <Select
+                value={timeFilter}
+                onValueChange={(value: "monthly" | "yearly") =>
+                  setTimeFilter(value)
+                }
+              >
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -316,7 +367,9 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-blue-600" />
-              <span>{timeFilter === "monthly" ? "Monthly" : "Yearly"} Entries</span>
+              <span>
+                {timeFilter === "monthly" ? "Monthly" : "Yearly"} Entries
+              </span>
             </CardTitle>
             <CardDescription>Data entry trends over time</CardDescription>
           </CardHeader>
@@ -327,7 +380,13 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
                 <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip />
-                <Area type="monotone" dataKey="entries" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
+                <Area
+                  type="monotone"
+                  dataKey="entries"
+                  stroke="#3B82F6"
+                  fill="#3B82F6"
+                  fillOpacity={0.3}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -462,5 +521,5 @@ export function AnalyticsDashboard({ userRole }: AnalyticsProps) {
         </CardContent>
       </Card> */}
     </div>
-  )
+  );
 }

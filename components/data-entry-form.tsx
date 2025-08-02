@@ -161,7 +161,7 @@ export function DataEntryForm() {
                     Record No
                   </TableHead>
                   <TableHead className=" min-w-[200px] max-w-[300px]">
-                    Lead Id
+                    Lead ID
                   </TableHead>
                   <TableHead className=" min-w-[200px] max-w-[300px]">
                     Applicant First Name

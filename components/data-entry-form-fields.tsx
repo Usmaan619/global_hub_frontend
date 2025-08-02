@@ -29,8 +29,8 @@ export function DataEntryFormFields({
   setSelectedImage,
   fileInputRef,
   topRef,
+  loading,
 }: DataEntryFormFieldsProps) {
-  
   const params = useParams();
 
   const entryId = params.id as string;
@@ -180,7 +180,7 @@ export function DataEntryFormFields({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="lead_no">
-                  Lead Id <span className="text-red-500">*</span>
+                  Lead ID <span className="text-red-500">*</span>
                 </Label>
               </div>
               <Input
@@ -629,6 +629,7 @@ export function DataEntryFormFields({
           <Button
             type="submit"
             id="createEntryId"
+            disabled={loading}
             className="w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
           >
             {entryId ? "Save Entry" : "Create Entry"}

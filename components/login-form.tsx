@@ -29,7 +29,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const { fetchLockStatus, PortalLock, setUserAndToken } = useAuthStore();
-  console.log("PortalLock: ", PortalLock);
+
   useEffect(() => {
     const fetchLockStatusApi = async () => {
       const res = await fetchLockStatus();
@@ -38,118 +38,6 @@ export function LoginForm() {
   }, []);
 
   const router = useRouter();
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   try {
-  //     const res = await postData("/auth/login", {
-  //       username: UserName,
-  //       password,
-  //     });
-
-  //     if (res.success) {
-  //       const user = { ...res.user, role: res.role }; // attach role manually
-
-  //       if (res.role === "superadmin") {
-  //         setUserAndToken(user, res.token);
-  //         router.push("/dashboard");
-  //       }
-
-  //       if (!PortalLock) {
-  //         console.log();
-  //         if (res.role === "admin") {
-  //           setUserAndToken(user, res.token);
-  //           router.push("/admin");
-  //         } else {
-  //           setUserAndToken(user, res.token);
-  //           router.push("/entries");
-  //         }
-  //       }
-  //       toast({ title: "Success", description: res.message });
-  //     } else {
-  //       toast({
-  //         title: "Login failed",
-  //         description: res.message,
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   } catch (error: any) {
-  //     toast({
-  //       title: "Login error",
-  //       description: error?.message || "Something went wrong",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await postData("/auth/login", {
-  //       username: UserName,
-  //       password,
-  //     });
-
-  //     console.log("res: ", res);
-
-  //     //       useAuthStore.getState().setCurrentUser(res.user);
-  //     // useAuthStore.getState().setToken(token);
-
-  //     if (!res.success) {
-  //       toast({
-  //         title: "Login failed",
-  //         description: res.message,
-  //         variant: "destructive",
-  //       });
-  //       return;
-  //     }
-
-  //     const user = { ...res.user, role: res.role };
-
-  //     // Superadmin bypasses portal lock
-  //     if (res.role === "superadmin") {
-  //       setUserAndToken(user, res.token);
-  //       router.push("/dashboard");
-  //       toast({ title: "Success", description: res.message });
-  //       return;
-  //     }
-
-  //     // Portal locked for non-superadmin
-  //     if (PortalLock) {
-  //       toast({
-  //         title: "Portal Locked",
-  //         description:
-  //           "Access is currently restricted. Please try again later.",
-  //         variant: "destructive",
-  //       });
-  //       return;
-  //     }
-
-  //     // Admin or other user
-  //     setUserAndToken(user, res.token);
-
-  //     if (res.role === "admin") {
-  //       router.push("/admin");
-  //     } else {
-  //       router.push("/entries");
-  //     }
-
-  //     toast({ title: "Success", description: res.message });
-  //   } catch (error: any) {
-  //     toast({
-  //       title: "Login error",
-  //       description: error?.message || "Something went wrong",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,7 +120,11 @@ export function LoginForm() {
             <CardDescription>Sign in to access your dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form
+              spellCheck="false"
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="UserName">Username </Label>

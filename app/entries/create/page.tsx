@@ -64,45 +64,56 @@ export default function CreateEntryPage() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const topRef = useRef(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
 
-    if (!currentUser) {
-      showToast(
-        "Authentication Error",
-        "You must be logged in to create an entry.",
-        "destructive"
-      );
-      return;
-    }
-    if (!formData.image) {
-      showToast(
-        "Missing Image",
-        "Please upload an image before submitting.",
-        "destructive"
-      );
-      return;
-    }
-
-    formData.image = "text";
-    const res = await createDataEntry({
-      ...formData,
-      user_id: currentUser.id,
-    });
-
-    if (res?.success) {
-      showToast("Entry created", "Data entry has been created successfully.");
-      resetForm();
-
-      if (topRef.current) {
-        // topRef.current.scrollTop = 0;
-        topRef.current.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
+      if (!currentUser) {
+        showToast(
+          "Authentication Error",
+          "You must be logged in to create an entry.",
+          "destructive"
+        );
+        return;
       }
+      if (!formData.image) {
+        showToast(
+          "Missing Image",
+          "Please upload an image before submitting.",
+          "destructive"
+        );
+        return;
+      }
+
+      setLoading(true);
+      formData.image = "text";
+      const res = await createDataEntry({
+        ...formData,
+        user_id: currentUser.id,
+      });
+
+      if (res?.success) {
+        showToast("Entry created", "Data entry has been created successfully.");
+        resetForm();
+
+        if (topRef.current) {
+          // topRef.current.scrollTop = 0;
+          topRef.current.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }
+        setLoading(false);
+      }
+
+      if (!res?.success) {
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
     }
   };
 
@@ -158,7 +169,11 @@ export default function CreateEntryPage() {
               </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+              spellCheck="false"
+              onSubmit={handleSubmit}
+              className="space-y-6 px-10"
+            >
               <DataEntryFormFields
                 formData={formData}
                 setFormData={setFormData}
@@ -166,6 +181,7 @@ export default function CreateEntryPage() {
                 setSelectedImage={setSelectedImage}
                 fileInputRef={fileInputRef}
                 topRef={topRef}
+                loading={loading}
               />
             </form>
           </div>

@@ -102,23 +102,6 @@ export function SuperAdminDashboard() {
     };
   });
 
-  
-  //   {
-  //     "success": true,
-  //     "total_admins": 1,
-  //     "total_users": 2,
-  //     "total_records": 13,
-  //     "superadmin_summary": [
-  //         {
-  //             "admin_id": 10,
-  //             "admin_name": "Admin namesssssssssssssssssssss",
-  //             "user_count": 2,
-  //             "record_count": 1
-  //         }
-  //     ],
-  //     "admin_detail": null
-  // }
-
   // Generate monthly data for the last 6 months
   const generateMonthlyData = () => {
     const now = new Date();

@@ -36,11 +36,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
-import { deleteData, getData, postData } from "@/services/api";
+import { Plus, Edit, Trash2, FileDown } from "lucide-react";
+import { deleteData, postData } from "@/services/api";
 import axios from "axios";
 
 export function UserManagement() {
@@ -56,8 +55,6 @@ export function UserManagement() {
   } = useAuthStore();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
-
-  
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -87,74 +84,6 @@ export function UserManagement() {
       ? users.filter((u) => u?.role !== "superadmin")
       : getUsersByAdmin(currentUser?.id || "");
 
-  // Removed handlePaste function
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //
-  //   if (editingUser) {
-  //     // updateUser(editingUser.id, formData);
-
-  //     try {
-  //       let res;
-
-  //       if (currentUser?.role === "superadmin")
-  //         res = await postData(`/update/admin/${editingUser?.admin_id}`, {
-  //           name: formData.name,
-  //           username: formData.userName,
-  //           password: formData.password,
-  //           user_limit: formData.user_limit,
-  //         });
-
-  //       if (currentUser?.role === "admin")
-  //         res = await postData(`update/user/by/id${editingUser?.id}`, {
-  //           name: formData.name,
-  //           username: formData.userName,
-  //           password: formData.password,
-  //         });
-  //       if (res?.success) {
-  //         setEditingUser(null);
-  //         await fetchAdminAndUser();
-
-  //         toast({
-  //           title: "Admin updated",
-  //           description: "Admin has been updated successfully.",
-  //         });
-  //       }
-
-  //
-  //     } catch (error) {
-  //
-  //     }
-  //   } else {
-  //     const success = createUser(formData);
-  //     if (success) {
-  //       toast({
-  //         title: "User created",
-  //         description: "User has been created successfully.",
-  //       });
-  //       setIsCreateDialogOpen(false);
-  //       await fetchAdminAndUser();
-  //     } else {
-  //       toast({
-  //         title: "Failed to create user",
-  //         description:
-  //           "You may have reached the user limit or lack permissions.",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   }
-
-  //   setFormData({
-  //     name: "",
-  //     userName: "",
-  //     password: "",
-  //     role: "admin",
-  //     user_limit: "",
-  //   });
-  // };
-
   const resetForm = () => {
     setFormData({
       name: "",
@@ -177,9 +106,8 @@ export function UserManagement() {
     };
 
     const isSuperadmin = currentUser?.role === "superadmin";
-    
+
     const isAdmin = currentUser?.role === "admin";
-    
 
     try {
       if (editingUser) {
@@ -190,7 +118,6 @@ export function UserManagement() {
           password: formData.password,
         };
 
-        
         if (isSuperadmin) {
           endpoint = `/update/user/by/id/${editingUser.id}`;
           payload.user_limit = formData.user_limit;
@@ -212,25 +139,8 @@ export function UserManagement() {
           setIsCreateDialogOpen(false);
           await fetchAdminAndUser();
         }
-        // else {
-        //   showToast(
-        //     "Failed to create user",
-        //     "You may have reached the user limit or lack permissions.",
-        //     "destructive"
-        //   );
-        // }
       }
     } catch (error) {
-      // console.log(
-      //   "ssssssssssssssssssssssssssssssssssssssssssssssserror: ",
-      //   error
-      // );
-      // const err = error as any;
-      // showToast(
-      //   "Failed to create user",
-      //   err?.response?.data?.message,
-      //   "destructive"
-      // );
     } finally {
       resetForm();
     }
@@ -245,18 +155,6 @@ export function UserManagement() {
       role: user.role,
       user_limit: "",
     });
-
-    //     {
-    //     "admin_id": 4,
-    //     "name": "p",
-    //     "username": "p",
-    //     "admin_created_at": "2025-07-19T17:55:21.000Z",
-    //     "user_limit": 6,
-    //     "role_name": "admin",
-    //     "admin_password": "p",
-    //     "user_count": 0,
-    //     "users": []
-    // }
   };
 
   const handleDelete = async (userId: string) => {
@@ -370,7 +268,6 @@ export function UserManagement() {
     try {
       if (currentUser?.role === "superadmin") {
         const res = await deleteData(`/delete/all/record/by/user/id/${userId}`);
-        
 
         if (res?.success) {
           toast({
@@ -380,9 +277,7 @@ export function UserManagement() {
           await fetchAdminAndUser();
         }
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
   return (
     <Card>
@@ -415,7 +310,11 @@ export function UserManagement() {
                     Add a new user to the system
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                  spellCheck="false"
+                  onSubmit={handleSubmit}
+                  className="space-y-4"
+                >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="name">Name</Label>
@@ -830,7 +729,11 @@ export function UserManagement() {
               </DialogHeader>
 
               {/* 🔧 Edit Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form
+                spellCheck="false"
+                onSubmit={handleSubmit}
+                className="space-y-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="edit-name">Name</Label>
                   <Input

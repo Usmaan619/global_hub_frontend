@@ -172,7 +172,7 @@ export default function EditEntryPage() {
               </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form spellCheck="false" onSubmit={handleSubmit} className="space-y-6">
               <DataEntryFormFields
                 formData={formData}
                 setFormData={setFormData}

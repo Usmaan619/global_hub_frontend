@@ -6,7 +6,6 @@ import { DataEntryForm } from "@/components/data-entry-form";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { useAuthStore } from "@/stores/auth-store";
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
 export default function EntriesPage() {

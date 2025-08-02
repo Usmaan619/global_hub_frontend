@@ -7,26 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/auth-store";
-import {
-  Users,
-  FileText,
-  UserPlus,
-  Calendar,
-  BarChart3,
-  FileDown,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Users, FileText, Calendar } from "lucide-react";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 import { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -69,8 +55,6 @@ export function AdminDashboard() {
   if (!currentUser || currentUser.role !== "admin") {
     return null;
   }
-
-
 
   const myUsers = getUsersByAdmin(currentUser.id);
   const user_ids = myUsers?.map((u) => u.id);
@@ -313,7 +297,6 @@ export function AdminDashboard() {
             <p className="text-xs text-muted-foreground">From all your users</p>
           </CardContent>
         </Card>
-
 
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
