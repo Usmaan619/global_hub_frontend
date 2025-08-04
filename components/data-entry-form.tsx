@@ -24,6 +24,7 @@ import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Search, X } from "lucide-react"; // Removed Copy import
 import { Badge } from "@/components/ui/badge";
 import { deleteData, getData } from "@/services/api";
+import moment from "moment";
 
 export function DataEntryForm() {
   const {
@@ -35,7 +36,6 @@ export function DataEntryForm() {
     setDataEntryId,
   } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
-  
 
   const router = useRouter();
 
@@ -61,15 +61,12 @@ export function DataEntryForm() {
     );
   }, [userEntries, searchTerm]);
 
-  
-
   // Removed handleCopy function
 
   const clearSearch = () => {
     setSearchTerm("");
   };
 
-  
   const getUserName = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user?.name || "Unknown User";
@@ -261,11 +258,11 @@ export function DataEntryForm() {
                     Official Remark
                   </TableHead>
 
-                  {currentUser?.role === "superadmin" && (
+                  {/* {currentUser?.role === "superadmin" && (
                     <TableHead className=" min-w-[200px] max-w-[300px]">
                       Created By
                     </TableHead>
-                  )}
+                  )} */}
                   <TableHead className=" min-w-[200px] max-w-[300px]">
                     Created Date
                   </TableHead>
@@ -421,15 +418,15 @@ export function DataEntryForm() {
                       </TableCell>
 
                       {/* Created By and Timestamp */}
-                      {currentUser?.role === "superadmin" && (
+                      {/* {currentUser?.role === "superadmin" && (
                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                           <Badge variant="outline">
                             {getUserName(entry?.user_id)}
                           </Badge>
                         </TableCell>
-                      )}
+                      )} */}
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
-                        {new Date(entry?.created_at).toLocaleDateString()}
+                        {moment(entry?.created_at).format("DD/MM/YYYY, h:mm a")}
                       </TableCell>
                     </TableRow>
                   ))

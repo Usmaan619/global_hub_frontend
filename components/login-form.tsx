@@ -28,7 +28,7 @@ export function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const { fetchLockStatus, PortalLock, setUserAndToken } = useAuthStore();
+  const { fetchLockStatus, setUserAndToken } = useAuthStore();
 
   useEffect(() => {
     const fetchLockStatusApi = async () => {
@@ -42,6 +42,8 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const lock = await fetchLockStatus();
+    console.log("lock: ", lock);
 
     try {
       const res = await postData("/auth/login", {
@@ -61,7 +63,8 @@ export function LoginForm() {
       const user = { ...res.user, role: res.role };
 
       // Portal lock check (optional)
-      if (res.role !== "superadmin" && PortalLock) {
+      console.log("lock: ", lock);
+      if (res.role !== "superadmin" && lock) {
         toast({
           title: "Portal Locked",
           description:

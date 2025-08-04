@@ -1,5 +1,3 @@
-
-
 // =================================
 
 import { toast } from "@/hooks/use-toast";
@@ -181,6 +179,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   createUser: async (userData) => {
     const { currentUser, users } = get();
+    const res = await get().fetchLockStatus();
+
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!currentUser) {
       toast({
         title: "Authentication required",
@@ -234,13 +244,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       return false;
     } catch (error) {
-      
       const err = error as any;
+      console.log("err: ", err);
       toast({
-        title: "Failed to create user",
-        description:
-          err?.response?.data?.message ||
-          "Failed to create user due to server error.",
+        title: err?.message || "Failed to create user",
+        description: "Failed to create user",
         variant: "destructive",
       });
       return false;
@@ -262,6 +270,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   createDataEntry: async (entryData) => {
+    const res = await get().fetchLockStatus();
+    const { currentUser } = get();
+
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     const useBackend = true;
 
     function camelToSnake<T extends Record<string, any>>(
@@ -303,12 +324,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return { success: true };
     } catch (error) {
-      
       return { success: false };
     }
   },
 
   updateDataEntry: async (id, entryData) => {
+    const res = await get().fetchLockStatus();
+    const { currentUser } = get();
+
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const res = await postData(`update/record/by/id/${id}`, entryData);
       if (res?.result) {
@@ -331,7 +364,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return res;
       }
     } catch (error) {
-      
       toast({
         title: "Update failed",
         description: "Server did not return updated record.",
@@ -358,7 +390,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchAdminAndUser: async () => {
     const { currentUser } = get();
     if (!currentUser) return;
-
+    const res = await get().fetchLockStatus();
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       let res;
       if (currentUser.role === "superadmin") {
@@ -374,9 +416,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (res?.success) {
         set({ AdminData: res?.user?.data });
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   },
 
   getDataEntriesByUser: (userId) => {
@@ -385,6 +425,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   fetchDataEntries: async () => {
     const { currentUser } = get();
+    const res = await get().fetchLockStatus();
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!currentUser) return;
 
     try {
@@ -394,15 +445,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (res?.record) {
         set({ dataEntries: res?.record });
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   },
 
   fetchCountAdminAndUser: async () => {
     const { currentUser } = get();
     if (!currentUser) return;
+    const res = await get().fetchLockStatus();
+    if (currentUser?.role !== "superadmin" && res) {
+      get().logout();
 
+      window.location.href = "/";
+      toast({
+        title: "Portal Locked",
+        description: "Access is currently restricted. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       let res;
       if (currentUser.role === "superadmin")
@@ -415,9 +475,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (res?.success) {
         set({ DashboardData: res });
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   },
 
   fetchLockStatus: async () => {
@@ -425,9 +483,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await getData(`lock-status`);
       set({ PortalLock: res?.disabled });
       return res?.disabled;
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   },
 
   // restoreUserFromToken: async () => {
@@ -441,7 +497,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   //     useAuthStore.getState().setToken(token);
   //   }
   // } catch (err) {
-  //   
+  //
   //   useAuthStore.getState().logout();
   // }
   // }

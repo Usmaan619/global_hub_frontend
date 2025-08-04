@@ -1,29 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect } from "react"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
-import { useThemeStore } from "@/stores/theme-store"
+import type React from "react";
+import { useEffect } from "react";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import { useThemeStore } from "@/stores/theme-store";
+import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/stores/auth-store";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function ClientLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { theme } = useThemeStore()
+  const { theme } = useThemeStore();
+  const pathname = usePathname();
+  const { fetchLockStatus, currentUser, logout } = useAuthStore();
+
+  // useEffect(() => {
+  //   const fetchLockStatusApi = async () => {
+  //     const res: any = await fetchLockStatus();
+  //     console.log("res:-----------ClientLayout ", res);
+  //     if (currentUser?.role !== "superadmin" && res) {
+  //       logout();
+  //     }
+  //   };
+  //   fetchLockStatusApi();
+  // }, [pathname]);
 
   useEffect(() => {
     // Apply theme on mount
     if (theme === "dark") {
-      document.documentElement.classList.add("dark")
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove("dark")
+      document.documentElement.classList.remove("dark");
     }
-  }, [theme])
+  }, [theme]);
 
   return (
     <html lang="en">
@@ -32,5 +47,5 @@ export default function ClientLayout({
         <Toaster />
       </body>
     </html>
-  )
+  );
 }

@@ -109,7 +109,7 @@ export function DataEntryFormFields({
       {/* Image Section - Fixed on md and larger screens */}
       <div className="md:w-1/3 flex-shrink-0 space-y-4">
         <Label>Image</Label>
-        <div className="border-2  border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[550px] w-10/12 flex flex-col justify-center items-center">
+        <div className="border-2  border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[555px] w-11/12 flex flex-col justify-center items-center">
           {selectedImage ? (
             <div className="relative group w-10/12 h-full flex items-center justify-center">
               <img

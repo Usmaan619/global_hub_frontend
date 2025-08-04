@@ -58,7 +58,7 @@ const initialFormData: FormData = {
 };
 
 export default function CreateEntryPage() {
-  const { currentUser, createDataEntry } = useAuthStore();
+  const { currentUser, createDataEntry, PortalLock, logout } = useAuthStore();
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -69,6 +69,9 @@ export default function CreateEntryPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     try {
+      // if (currentUser?.role !== "superadmin" && PortalLock) {
+      //   logout();
+      // }
       e.preventDefault();
 
       if (!currentUser) {
