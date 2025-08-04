@@ -43,7 +43,6 @@ export function LoginForm() {
     e.preventDefault();
     setLoading(true);
     const lock = await fetchLockStatus();
-    console.log("lock: ", lock);
 
     try {
       const res = await postData("/auth/login", {
@@ -63,7 +62,7 @@ export function LoginForm() {
       const user = { ...res.user, role: res.role };
 
       // Portal lock check (optional)
-      console.log("lock: ", lock);
+
       if (res.role !== "superadmin" && lock) {
         toast({
           title: "Portal Locked",
