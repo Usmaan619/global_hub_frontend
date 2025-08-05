@@ -178,8 +178,8 @@ export function UserManagement() {
       if (res?.success) {
         const msg = currentUser?.role === "superadmin" ? "Admin" : "User";
         toast({
-          title: `${msg} deleted`,
-          description: `${msg} has been deleted successfully.`,
+          title: `User deleted`,
+          description: `User has been deleted successfully.`,
         });
         await fetchAdminAndUser();
       }
