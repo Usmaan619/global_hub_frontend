@@ -161,19 +161,19 @@ export function UserManagement() {
     // deleteUser(userId);
 
     try {
-      let res;
+      // let res;
       // superadmin
       // /delete/admin/user/by/id/:id
 
       // admin
       // delete/user/by/id/:id
 
-      if (currentUser?.role === "superadmin") {
-        res = await deleteData(`/delete/admin/user/by/id/${userId}`);
-      }
-      if (currentUser?.role === "admin") {
-        res = await deleteData(`/delete/user/by/id/${userId}`);
-      }
+      // if (currentUser?.role === "superadmin") {
+      //   res = await deleteData(`/delete/admin/user/by/id/${userId}`);
+      // }
+      // if (currentUser?.role === "admin") {
+      const res = await deleteData(`/delete/user/by/id/${userId}`);
+      // }
 
       if (res?.success) {
         const msg = currentUser?.role === "superadmin" ? "Admin" : "User";
@@ -459,7 +459,7 @@ export function UserManagement() {
                             variant="outline"
                             size="sm"
                             title="Delete User"
-                            onClick={() => handleDelete(user?.admin_id)}
+                            onClick={() => handleDelete(user?.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
