@@ -124,6 +124,7 @@ export function LoginForm() {
           <CardContent>
             <form
               spellCheck="false"
+              autoComplete="off"
               onSubmit={handleSubmit}
               className="space-y-4"
             >

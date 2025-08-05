@@ -312,6 +312,8 @@ export function UserManagement() {
                 </DialogHeader>
                 <form
                   spellCheck="false"
+                  autoCapitalize="false"
+                  autoComplete="off"
                   onSubmit={handleSubmit}
                   className="space-y-4"
                 >
@@ -731,6 +733,8 @@ export function UserManagement() {
               {/* 🔧 Edit Form */}
               <form
                 spellCheck="false"
+                autoCapitalize="false"
+                autoComplete="off"
                 onSubmit={handleSubmit}
                 className="space-y-4"
               >

@@ -333,6 +333,8 @@ export function AmdinManagement() {
                 </DialogHeader>
                 <form
                   spellCheck="false"
+                  autoCapitalize="false"
+                  autoComplete="off"
                   onSubmit={handleSubmit}
                   className="space-y-4"
                 >
@@ -765,6 +767,8 @@ export function AmdinManagement() {
               {/* 🔧 Edit Form */}
               <form
                 spellCheck="false"
+                autoCapitalize="false"
+                autoComplete="off"
                 onSubmit={handleSubmit}
                 className="space-y-4"
               >

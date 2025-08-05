@@ -21,16 +21,15 @@ export default function EditEntryPage() {
   const { currentUser, dataEntries, updateDataEntry, entryId } = useAuthStore();
   const { sidebarCollapsed } = useThemeStore();
   const router = useRouter();
-  // 
+  //
   const params = useParams();
-  
 
   // const { id } = router?.query;
-  // 
+  //
 
   //  const searchParams = useSearchParams();
   // const id = searchParams.get('id');;
-  // 
+  //
 
   // const entryId = params.id as string;
   // const entryId = id as string;
@@ -83,8 +82,6 @@ export default function EditEntryPage() {
         (entry) => parseInt(entry.id) === parseInt(entryId)
       );
       if (entryToEdit) {
-        
-
         // Destructure to exclude id, userId, createdAt, updatedAt
         const { id, user_id, created_at, updated_at, ...rest } = entryToEdit;
         setFormData(rest);
@@ -172,7 +169,12 @@ export default function EditEntryPage() {
               </Button>
             </div>
 
-            <form spellCheck="false" onSubmit={handleSubmit} className="space-y-6">
+            <form
+              spellCheck="false"
+              autoComplete="off"
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
               <DataEntryFormFields
                 formData={formData}
                 setFormData={setFormData}

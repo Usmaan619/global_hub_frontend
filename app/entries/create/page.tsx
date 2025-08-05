@@ -174,6 +174,8 @@ export default function CreateEntryPage() {
 
             <form
               spellCheck="false"
+              autoCapitalize="none"
+              autoComplete="off"
               onSubmit={handleSubmit}
               className="space-y-6 px-10"
             >
