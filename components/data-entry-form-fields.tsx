@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react"; // Removed Copy icon
 import { toast } from "@/hooks/use-toast";
-import type { DataEntry } from "@/stores/auth-store"; // Import DataEntry type
+import { useAuthStore, type DataEntry } from "@/stores/auth-store"; // Import DataEntry type
 import { useParams } from "next/navigation";
 import { useRef } from "react";
 
@@ -32,6 +32,7 @@ export function DataEntryFormFields({
   loading,
 }: DataEntryFormFieldsProps) {
   const params = useParams();
+  const { currentUser } = useAuthStore();
 
   const entryId = params.id as string;
 
@@ -173,6 +174,7 @@ export function DataEntryFormFields({
               <Input
                 id="record_no"
                 value={formData.record_no}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -186,6 +188,7 @@ export function DataEntryFormFields({
               <Input
                 id="lead_no"
                 value={formData.lead_no}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -199,6 +202,7 @@ export function DataEntryFormFields({
               <Input
                 id="applicant_first_name"
                 value={formData.applicant_first_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -212,6 +216,7 @@ export function DataEntryFormFields({
               <Input
                 id="applicant_last_name"
                 value={formData.applicant_last_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -225,6 +230,7 @@ export function DataEntryFormFields({
               <Input
                 id="street_address"
                 value={formData.street_address}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -238,6 +244,7 @@ export function DataEntryFormFields({
               <Input
                 id="city"
                 value={formData.city}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -251,6 +258,7 @@ export function DataEntryFormFields({
               <Input
                 id="zip_code"
                 value={formData.zip_code}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -265,6 +273,7 @@ export function DataEntryFormFields({
                 id="applicant_dob"
                 type="text"
                 value={formData.applicant_dob}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -279,6 +288,7 @@ export function DataEntryFormFields({
               <Input
                 id="co_applicant_first_name"
                 value={formData.co_applicant_first_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -292,6 +302,7 @@ export function DataEntryFormFields({
               <Input
                 id="co_applicant_last_name"
                 value={formData.co_applicant_last_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -306,6 +317,7 @@ export function DataEntryFormFields({
                 id="best_time_to_call"
                 type="Text"
                 value={formData.best_time_to_call}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -320,6 +332,7 @@ export function DataEntryFormFields({
                 id="personal_remark"
                 value={formData.personal_remark}
                 onChange={handleChange}
+                disabled={currentUser?.role === "admin" ? true : false}
                 rows={3}
                 required
               />
@@ -341,6 +354,7 @@ export function DataEntryFormFields({
               <Input
                 id="type_of_property"
                 value={formData.type_of_property}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -355,6 +369,7 @@ export function DataEntryFormFields({
                 id="property_value"
                 type="text"
                 value={formData.property_value}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -368,6 +383,7 @@ export function DataEntryFormFields({
               <Input
                 id="mortgage_type"
                 value={formData.mortgage_type}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -382,6 +398,7 @@ export function DataEntryFormFields({
                 id="loan_amount"
                 type="text"
                 value={formData.loan_amount}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -395,6 +412,7 @@ export function DataEntryFormFields({
               <Input
                 id="loan_term"
                 value={formData.loan_term}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -408,6 +426,7 @@ export function DataEntryFormFields({
               <Input
                 id="interest_type"
                 value={formData.interest_type}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -422,6 +441,7 @@ export function DataEntryFormFields({
                 id="monthly_installment"
                 type="text"
                 value={formData.monthly_installment}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -435,6 +455,7 @@ export function DataEntryFormFields({
               <Input
                 id="existing_loan"
                 value={formData.existing_loan}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -449,6 +470,7 @@ export function DataEntryFormFields({
                 id="annual_income"
                 type="text"
                 value={formData.annual_income}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -463,6 +485,7 @@ export function DataEntryFormFields({
                 id="down_payment"
                 type="text"
                 value={formData.down_payment}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -477,6 +500,7 @@ export function DataEntryFormFields({
                 id="asset_remark"
                 value={formData.asset_remark}
                 onChange={handleChange}
+                disabled={currentUser?.role === "admin" ? true : false}
                 rows={3}
                 required
               />
@@ -498,6 +522,7 @@ export function DataEntryFormFields({
               <Input
                 id="lender_name"
                 value={formData.lender_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -512,6 +537,7 @@ export function DataEntryFormFields({
               <Input
                 id="loan_officer_first_name"
                 value={formData.loan_officer_first_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -525,6 +551,7 @@ export function DataEntryFormFields({
               <Input
                 id="loan_officer_last_name"
                 value={formData.loan_officer_last_name}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -538,6 +565,7 @@ export function DataEntryFormFields({
               <Input
                 id="tr_number"
                 value={formData.tr_number}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -551,6 +579,7 @@ export function DataEntryFormFields({
               <Input
                 id="ni_number"
                 value={formData.ni_number}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -564,6 +593,7 @@ export function DataEntryFormFields({
               <Input
                 id="occupation"
                 value={formData.occupation}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -578,6 +608,7 @@ export function DataEntryFormFields({
                 id="other_income"
                 type="text"
                 value={formData.other_income}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -591,6 +622,7 @@ export function DataEntryFormFields({
               <Input
                 id="credit_card_type"
                 value={formData.credit_card_type}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -605,6 +637,7 @@ export function DataEntryFormFields({
                 id="credit_score"
                 type="text"
                 value={formData.credit_score}
+                disabled={currentUser?.role === "admin" ? true : false}
                 onChange={handleChange}
                 required
               />
@@ -619,22 +652,24 @@ export function DataEntryFormFields({
                 id="official_remark"
                 value={formData.official_remark}
                 onChange={handleChange}
+                disabled={currentUser?.role === "admin" ? true : false}
                 rows={3}
                 required
               />
             </div>
           </div>
         </div>
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            id="createEntryId"
-            disabled={loading}
-            className="w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-          >
-            {entryId ? "Save Entry" : "Create Entry"}
-          </Button>
-          {/* {!entryId && (
+        {currentUser?.role !== "admin" && (
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              id="createEntryId"
+              disabled={loading}
+              className="w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+            >
+              {entryId ? "Save Entry" : "Create Entry"}
+            </Button>
+            {/* {!entryId && (
             <Button
               onClick={handleReset()}
               className="ms-3 w-1/4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
@@ -642,7 +677,8 @@ export function DataEntryFormFields({
               Reset
             </Button>
           )} */}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

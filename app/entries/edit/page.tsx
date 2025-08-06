@@ -157,10 +157,14 @@ export default function EditEntryPage() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Edit Data Entry
+                  {currentUser?.role === "admin"
+                    ? "View Data Entry"
+                    : "Edit Data Entry"}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  Update the details for this entry.
+                  {currentUser?.role === "admin"
+                    ? "View the details for this entry."
+                    : "Update the details for this entry."}
                 </p>
               </div>
               <Button variant="outline" onClick={() => router.push("/entries")}>

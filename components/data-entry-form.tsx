@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { useAuthStore, User } from "@/stores/auth-store";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Search, X } from "lucide-react"; // Removed Copy import
+import { Plus, Edit, Trash2, Search, X, Eye } from "lucide-react"; // Removed Copy import
 import { Badge } from "@/components/ui/badge";
 import { deleteData, getData } from "@/services/api";
 import moment from "moment";
@@ -148,11 +148,11 @@ export function DataEntryForm() {
             <Table>
               <TableHeader className="bg-gray-50 dark:bg-gray-800">
                 <TableRow>
-                  {currentUser?.role !== "admin" && (
-                    <TableHead className=" min-w-[200px] max-w-[300px]">
-                      Actions
-                    </TableHead>
-                  )}
+                  {/* {currentUser?.role !== "admin" && ( */}
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Actions
+                  </TableHead>
+                  {/* )} */}
 
                   <TableHead className=" min-w-[200px] max-w-[300px]">
                     Record No
@@ -300,6 +300,32 @@ export function DataEntryForm() {
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
                               <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDelete(entry?.id)}
+                              className="hover:bg-red-50 hover:border-red-300 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
+
+                      {currentUser?.role === "admin" && (
+                        <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                router.push(`/entries/edit`);
+                                setDataEntryId(entry?.id);
+                              }}
+                              className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                            >
+                              <Eye className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
