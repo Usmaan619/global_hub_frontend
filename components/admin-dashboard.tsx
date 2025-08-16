@@ -55,6 +55,10 @@ export function AdminDashboard() {
   if (!currentUser || currentUser.role !== "admin") {
     return null;
   }
+  console.log(
+    "DashboardData: ",
+    DashboardData?.monthly_user_record_stats_admin
+  );
 
   const myUsers = getUsersByAdmin(currentUser.id);
   const user_ids = myUsers?.map((u) => u.id);
@@ -260,13 +264,6 @@ export function AdminDashboard() {
               Here's what's happening with your team today.
             </p>
           </div>
-          {/* <Button
-            onClick={() => setShowAnalytics(true)}
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-          >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            View Analytics
-          </Button> */}
         </div>
       </div>
 
@@ -307,14 +304,6 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {/* {
-                myUsersDataEntries.filter((entry) => {
-                  const entryDate = new Date(entry.created_at);
-                  const weekAgo = new Date();
-                  weekAgo.setDate(weekAgo.getDate() - 7);
-                  return entryDate > weekAgo;
-                }).length
-              } */}
               {DashboardData?.admin_detail?.user_record_count || 0}
             </div>
             <p className="text-xs text-muted-foreground">User entries</p>
@@ -323,55 +312,8 @@ export function AdminDashboard() {
       </div>
 
       {/* Charts Section */}
-      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Monthly Entries Chart */}
-        {/* <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <span>Monthly Team Entries</span>
-            </CardTitle>
-            <CardDescription>Your team's data entry trends (last 6 months)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={adminMonthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Area type="monotone" dataKey="entries" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card> */}
-
-        {/* User Performance Chart */}
-        {/* <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Users className="h-5 w-5 text-green-600" />
-              <span>User Performance</span>
-            </CardTitle>
-            <CardDescription>
-              Entries created by each team member
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={userPerformanceData} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={60} />
-                <Tooltip />
-                <Bar dataKey="entries" fill="#10B981" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card> */}
-
         <Card className="border-0 shadow-lg col-span-full">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -380,7 +322,7 @@ export function AdminDashboard() {
             </CardTitle>
             <CardDescription>Monthly data entry activity</CardDescription>
           </CardHeader>
-          <CardContent>
+          {/* <CardContent>
             {DashboardData?.monthly_user_record_stats_admin?.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
@@ -419,41 +361,79 @@ export function AdminDashboard() {
                 No data found
               </div>
             )}
+          </CardContent> */}
+          <CardContent>
+            {DashboardData?.monthly_user_record_stats_admin?.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart
+                  data={(() => {
+                    const raw = DashboardData?.monthly_user_record_stats_admin;
+
+                    // Step 1: Unique months in sorted order
+                    const months = Array.from(new Set(raw?.map((r:any) => r?.month)));
+
+                    // Step 2: Unique user names
+                    const users = Array.from(
+                      new Set(raw.map((r:any) => r?.user_name))
+                    );
+
+                    // Step 3: Build dataset where each month is an object with user values
+                    const data = months.map((month) => {
+                      const monthData: any = { month };
+                      users.forEach((user) => {
+                        const record = raw.find(
+                          (r:any) => r?.month === month && r?.user_name === user
+                        );
+                        monthData[user] = record?.record_count || 0;
+                      });
+                      return monthData;
+                    });
+
+                    return data;
+                  })()}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+
+                  {/* Step 4: Generate dynamic Area for each user */}
+                  {Array.from(
+                    new Set(
+                      DashboardData?.monthly_user_record_stats_admin?.map(
+                        (r:any) => r?.user_name
+                      )
+                    )
+                  ).map((user, index) => (
+                    <Area
+                      key={user}
+                      type="monotone"
+                      dataKey={user}
+                      stackId="1"
+                      stroke={`hsl(${(index * 70) % 360}, 70%, 50%)`}
+                      fill={`hsl(${(index * 70) % 360}, 70%, 80%)`}
+                      name={user}
+                    />
+                  ))}
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div
+                style={{
+                  height: 250,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                No data found
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Daily Activity Chart */}
-      {/* <div className="grid grid-cols-1 gap-6 mb-6">
-        <Card className="border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-purple-600" />
-              <span>Daily Team Activity (Last 14 Days)</span>
-            </CardTitle>
-            <CardDescription>
-              Daily entry creation patterns for your team
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={adminDailyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="entries"
-                  stroke="#8B5CF6"
-                  strokeWidth={2}
-                  dot={{ fill: "#8B5CF6" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div> */}
       <div className="grid  gap-6">
         {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}
         {/* My Users Overview */}
