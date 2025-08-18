@@ -298,15 +298,17 @@ export function AdminDashboard() {
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              User Entries Count
+              Daily Entries Count
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {DashboardData?.admin_detail?.user_record_count || 0}
+              {DashboardData?.today_user_record_count_under_admin || 0}
             </div>
-            <p className="text-xs text-muted-foreground">User entries</p>
+            <p className="text-xs text-muted-foreground">
+              Users daily entries count
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -370,11 +372,13 @@ export function AdminDashboard() {
                     const raw = DashboardData?.monthly_user_record_stats_admin;
 
                     // Step 1: Unique months in sorted order
-                    const months = Array.from(new Set(raw?.map((r:any) => r?.month)));
+                    const months = Array.from(
+                      new Set(raw?.map((r: any) => r?.month))
+                    );
 
                     // Step 2: Unique user names
                     const users = Array.from(
-                      new Set(raw.map((r:any) => r?.user_name))
+                      new Set(raw.map((r: any) => r?.user_name))
                     );
 
                     // Step 3: Build dataset where each month is an object with user values
@@ -382,7 +386,8 @@ export function AdminDashboard() {
                       const monthData: any = { month };
                       users.forEach((user) => {
                         const record = raw.find(
-                          (r:any) => r?.month === month && r?.user_name === user
+                          (r: any) =>
+                            r?.month === month && r?.user_name === user
                         );
                         monthData[user] = record?.record_count || 0;
                       });
@@ -402,7 +407,7 @@ export function AdminDashboard() {
                   {Array.from(
                     new Set(
                       DashboardData?.monthly_user_record_stats_admin?.map(
-                        (r:any) => r?.user_name
+                        (r: any) => r?.user_name
                       )
                     )
                   ).map((user, index) => (
