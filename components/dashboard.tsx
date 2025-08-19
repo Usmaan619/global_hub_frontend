@@ -9,7 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuthStore } from "@/stores/auth-store";
-import { Download, Users, FileText, UserCheck, BarChart3, FileDown } from "lucide-react";
+import {
+  Download,
+  Users,
+  FileText,
+  
+  UserCheck,
+  FileBadge
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 import { useEffect, useState } from "react";
@@ -243,7 +250,6 @@ export function Dashboard() {
       entries: item.record_count, // Y axis
     })
   );
-  
 
   const handleDonwloadCSV = async (user_id: any) => {
     if (!user_id) {
@@ -281,7 +287,7 @@ export function Dashboard() {
         reader.onload = () => {
           try {
             const result = JSON.parse(reader.result as string);
-            
+
             toast({
               title: "Download Failed",
               description: result.message || "No records found for this user.",
@@ -303,8 +309,6 @@ export function Dashboard() {
           variant: "destructive",
         });
       }
-
-      
     }
   };
   return (
@@ -373,6 +377,20 @@ export function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
               {DashboardData?.total_user_record_count || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {currentUser?.role === "user" ? "Today Record Count" : ""}
+            </CardTitle>
+            <FileBadge className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">
+              {DashboardData?.today_user_record_count || 0}
             </div>
           </CardContent>
         </Card>

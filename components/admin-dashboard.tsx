@@ -32,6 +32,7 @@ import {
 import axios from "axios";
 import { deleteData } from "@/services/api";
 import { toast } from "./ui/use-toast";
+import { UserRecordsChart } from "./daily-record-count-graph";
 
 export function AdminDashboard() {
   const {
@@ -438,6 +439,10 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <UserRecordsChart
+        data={DashboardData?.today_user_record_stats_under_admin || []}
+      />
 
       <div className="grid  gap-6">
         {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> */}

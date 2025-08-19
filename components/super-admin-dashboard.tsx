@@ -433,10 +433,10 @@ export function SuperAdminDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-blue-600" />
-              <span>Current Month Daily Entries</span>
+              <span>Current Month</span>
             </CardTitle>
             <CardDescription>
-              Daily data entry activity for the current month
+              Daily data activity for the current month
             </CardDescription>
           </CardHeader>
           <CardContent>
