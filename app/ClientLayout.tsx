@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { useThemeStore } from "@/stores/theme-store";
+import { useGlobalSecurity } from "@/hooks/useGlobalSecurity";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,6 +15,8 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useGlobalSecurity();
+
   const { theme } = useThemeStore();
 
   useEffect(() => {
