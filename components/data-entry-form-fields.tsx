@@ -108,49 +108,50 @@ export function DataEntryFormFields({
   return (
     <div className="flex flex-col md:flex-row gap-5 w-full h-full">
       {/* Image Section - Fixed on md and larger screens */}
-      <div className="md:w-1/3 flex-shrink-0 space-y-4">
-        <Label>Image</Label>
-        <div className="border-2  border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[555px] w-11/12 flex flex-col justify-center items-center">
-          {selectedImage ? (
-            <div className="relative group w-10/12 h-full flex items-center justify-center">
-              <img
-                src={selectedImage || "/placeholder.svg"}
-                alt="Preview"
-                className="w-full h-full object-contain  rounded transition-transform group-hover:scale-90"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Change Image
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-gray-500 dark:text-gray-400">
-              <Upload className="h-12 w-12 mx-auto mb-2" />
-              <p>Click to upload image (765x850px)</p>
-            </div>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
+     <div className="md:w-1/3 flex-shrink-0 space-y-4">
+  <Label>Image</Label>
+  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors h-[555px] w-11/12 flex flex-col justify-center items-center">
+    {selectedImage ? (
+      <div className="relative group w-10/12 h-full flex items-center justify-center">
+        <img
+          src={selectedImage || "/placeholder.svg"}
+          alt="Preview"
+          className="w-full h-full object-contain rounded transition-transform group-hover:scale-90"
+        />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
           <Button
             type="button"
-            variant="outline"
-            className="mt-2 bg-transparent"
+            variant="secondary"
             onClick={() => fileInputRef.current?.click()}
           >
-            Choose Image
+            Change Image
           </Button>
         </div>
       </div>
+    ) : (
+      <div className="text-gray-500 dark:text-gray-400">
+        <Upload className="h-12 w-12 mx-auto mb-2" />
+        <p>Click to upload image (765x850px)</p>
+      </div>
+    )}
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept="image/*"
+      onChange={handleImageUpload}
+      className="hidden"
+    />
+    <Button
+      type="button"
+      variant="outline"
+      className="mt-2 bg-transparent"
+      onClick={() => fileInputRef.current?.click()}
+    >
+      Choose Image
+    </Button>
+  </div>
+</div>
+
 
       {/* Form Fields Section - Scrollable on md and larger screens */}
       <div

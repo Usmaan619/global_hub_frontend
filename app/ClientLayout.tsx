@@ -17,6 +17,9 @@ export default function ClientLayout({
 }) {
   useGlobalSecurity();
 
+  // intervalMs: 0 रखें जब तक periodic re-apply की जरूरत न हो
+  // useGlobalSecurity({ intervalMs: 1000, blockDevShortcuts: true });
+
   const { theme } = useThemeStore();
 
   useEffect(() => {
@@ -28,9 +31,15 @@ export default function ClientLayout({
     }
   }, [theme]);
 
+  useEffect(() => {
+    const handleContext = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener("contextmenu", handleContext);
+    return () => document.removeEventListener("contextmenu", handleContext);
+  }, []);
+
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} data-secure-root>
         {children}
         <Toaster />
       </body>
