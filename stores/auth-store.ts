@@ -1000,7 +1000,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!currentUser) return;
 
     try {
-      const res: PaginatedApiResponse<DataEntry> = await getData(
+      const res: any = await getData(
         `get/all/records?id=${currentUser?.id}&role=${currentUser?.role}&page=${page}&limit=${limit}&search=${search}`
       );
 

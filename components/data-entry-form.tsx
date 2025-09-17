@@ -613,7 +613,7 @@ export function DataEntryForm() {
       const res = await deleteData(`delete/record/by/id/${entryId}`)
 
       if (res?.success) {
-        deleteDataEntry(entryId.toString())
+        deleteDataEntry(entryId?.toString())
         fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm)
         toast({
           title: "Entry deleted",
@@ -777,7 +777,7 @@ export function DataEntryForm() {
                               size="sm"
                               onClick={() => {
                                 router.push(`/entries/edit`)
-                                setDataEntryId(entry?.id.toString())
+                                setDataEntryId(entry?.id?.toString())
                               }}
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
@@ -803,7 +803,7 @@ export function DataEntryForm() {
                               size="sm"
                               onClick={() => {
                                 router.push(`/entries/edit`)
-                                setDataEntryId(entry?.id.toString())
+                                setDataEntryId(entry?.id?.toString())
                               }}
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
