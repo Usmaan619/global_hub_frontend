@@ -690,6 +690,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   itemsPerPage: 10,
 
   setUserAndToken: (user, token, session) => {
+    console.log("user, token, session:setUserAndToken ", user, token, session);
     sessionStorage.setItem("token", token);
     sessionStorage.setItem("session", session);
     sessionStorage.setItem("currentUser", JSON.stringify(user));
@@ -701,6 +702,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const session = sessionStorage.getItem("session");
     const userStr = sessionStorage.getItem("currentUser");
 
+    console.log(
+      "token && userStr && session:restoreSession ",
+      token && userStr && session
+    );
     if (token && userStr && session) {
       const user = JSON.parse(userStr);
       set({ token, currentUser: user, session });
@@ -708,6 +713,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
+    console.log("logout");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("session");
     sessionStorage.removeItem("currentUser");
@@ -761,7 +767,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (currentUser.role === "superadmin") {
       // allowed
     } else if (currentUser.role === "admin" && userData.role === "user") {
+      console.log('userData: ', userData);
       const adminUsers = users.filter((u) => u.createdBy === currentUser.id);
+      console.log('adminUsers: ', adminUsers);
       if (adminUsers.length >= 5) {
         toast({
           title: "Limit reached",

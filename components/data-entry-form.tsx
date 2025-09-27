@@ -546,21 +546,43 @@
 //     </div>
 //   );
 // }
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useAuthStore } from "@/stores/auth-store"
-import { toast } from "@/hooks/use-toast"
-import { Plus, Edit, Trash2, Search, X, Eye, ChevronLeft, ChevronRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { deleteData } from "@/services/api"
-import moment from "moment"
-import { useDebounce } from "@/hooks/use-debounce"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "@/hooks/use-toast";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  X,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { deleteData } from "@/services/api";
+import moment from "moment";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export function DataEntryForm() {
   const {
@@ -573,82 +595,90 @@ export function DataEntryForm() {
     currentPage: storePage,
     itemsPerPage: storeItemsPerPage,
     fetchDataEntries,
-  } = useAuthStore()
+  } = useAuthStore();
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
-  const [isLoading, setIsLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (currentUser) {
-      setIsLoading(true)
-      fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm).finally(() => {
-        setIsLoading(false)
-      })
+      setIsLoading(true);
+      fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm).finally(
+        () => {
+          setIsLoading(false);
+        }
+      );
     }
-  }, [currentUser, currentPage, debouncedSearchTerm, fetchDataEntries, itemsPerPage])
+  }, [
+    currentUser,
+    currentPage,
+    debouncedSearchTerm,
+    fetchDataEntries,
+    itemsPerPage,
+  ]);
 
   useEffect(() => {
     if (debouncedSearchTerm !== searchTerm) {
-      setCurrentPage(1) // Reset to first page when searching
+      setCurrentPage(1); // Reset to first page when searching
     }
-  }, [debouncedSearchTerm, searchTerm])
+  }, [debouncedSearchTerm, searchTerm]);
 
   const clearSearch = () => {
-    setSearchTerm("")
-  }
+    setSearchTerm("");
+  };
 
   const getUserName = (userId: string) => {
-    const user = users.find((u) => u.id === userId)
-    return user?.name || "Unknown User"
-  }
+    const user = users.find((u) => u.id === userId);
+    return user?.name || "Unknown User";
+  };
 
   const handleDelete = async (entryId: number) => {
     try {
-      const res = await deleteData(`delete/record/by/id/${entryId}`)
+      const res = await deleteData(`delete/record/by/id/${entryId}`);
 
       if (res?.success) {
-        deleteDataEntry(entryId?.toString())
-        fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm)
+        deleteDataEntry(entryId?.toString());
+        fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm);
         toast({
           title: "Entry deleted",
           description: "Data entry has been deleted successfully.",
-        })
+        });
       }
     } catch (error) {
-      const err = error as any
+      const err = error as any;
 
       toast({
         title: err?.message || "Error",
         description: "Failed to delete entry.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
-  const totalPages = Math.ceil((totalEntries || 0) / itemsPerPage)
+  const totalPages = Math.ceil((totalEntries || 0) / itemsPerPage);
 
   const goToPage = (page: number) => {
-    const newPage = Math.max(1, Math.min(page, totalPages))
-    setCurrentPage(newPage)
-  }
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -664,13 +694,15 @@ export function DataEntryForm() {
                 Manage your data entries ({totalEntries || 0} total entries)
               </CardDescription>
             </div>
-            <Button
-              onClick={() => router.push("/entries/create")}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Entry
-            </Button>
+            {currentUser?.role !== "admin" && (
+              <Button
+                onClick={() => router.push("/entries/create")}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Entry
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -710,45 +742,115 @@ export function DataEntryForm() {
             <Table>
               <TableHeader className="bg-gray-50 dark:bg-gray-800">
                 <TableRow>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Actions</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Record No</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Lead ID</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Applicant First Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Applicant Last Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Street Address</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">City</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Zip Code</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Applicant DOB</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Co-Applicant First Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Co-Applicant Last Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Best Time to Call</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Personal Remark</TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Actions
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Record No
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Lead ID
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Applicant First Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Applicant Last Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Street Address
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    City
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Zip Code
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Applicant DOB
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Co-Applicant First Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Co-Applicant Last Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Best Time to Call
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Personal Remark
+                  </TableHead>
 
                   {/* Asset Info */}
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Type of Property</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Property Value</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Mortgage Type</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Loan Amount</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Loan Term</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Interest Type</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Monthly Installment</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Existing Loan</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Annual Income</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Down Payment</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Asset Remark</TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Type of Property
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Property Value
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Mortgage Type
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Loan Amount
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Loan Term
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Interest Type
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Monthly Installment
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Existing Loan
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Annual Income
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Down Payment
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Asset Remark
+                  </TableHead>
 
                   {/* Official Info */}
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Lender Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Loan Officer First Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Loan Officer Last Name</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">T.R #</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">N.I #</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Occupation</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Other Income</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Credit Card Type</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Credit Score</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Official Remark</TableHead>
-                  <TableHead className=" min-w-[200px] max-w-[300px]">Created Date</TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Lender Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Loan Officer First Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Loan Officer Last Name
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    T.R #
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    N.I #
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Occupation
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Other Income
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Credit Card Type
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Credit Score
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Official Remark
+                  </TableHead>
+                  <TableHead className=" min-w-[200px] max-w-[300px]">
+                    Created Date
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -760,14 +862,17 @@ export function DataEntryForm() {
                         {isLoading
                           ? "Loading entries..."
                           : searchTerm
-                            ? "No entries found matching your search."
-                            : "No entries created yet."}
+                          ? "No entries found matching your search."
+                          : "No entries created yet."}
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   dataEntries?.map((entry, i) => (
-                    <TableRow key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <TableRow
+                      key={i}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
                       {/* Actions */}
                       {currentUser?.role !== "admin" && (
                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
@@ -776,21 +881,23 @@ export function DataEntryForm() {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                router.push(`/entries/edit`)
-                                setDataEntryId(entry?.id?.toString())
+                                router.push(`/entries/edit`);
+                                setDataEntryId(entry?.id?.toString());
                               }}
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDelete(entry?.id)}
-                              className="hover:bg-red-50 hover:border-red-300 transition-colors"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            {currentUser?.role !== "user" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDelete(entry?.id)}
+                                className="hover:bg-red-50 hover:border-red-300 transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       )}
@@ -802,8 +909,8 @@ export function DataEntryForm() {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                router.push(`/entries/edit`)
-                                setDataEntryId(entry?.id?.toString())
+                                router.push(`/entries/edit`);
+                                setDataEntryId(entry?.id?.toString());
                               }}
                               className="hover:bg-blue-50 hover:border-blue-300 transition-colors"
                             >
@@ -939,8 +1046,9 @@ export function DataEntryForm() {
           {totalEntries > 0 && (
             <div className="flex items-center justify-between mt-6">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalEntries)}{" "}
-                of {totalEntries} entries
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, totalEntries)} of{" "}
+                {totalEntries} entries
               </div>
 
               <div className="flex items-center space-x-2">
@@ -957,21 +1065,23 @@ export function DataEntryForm() {
 
                 <div className="flex items-center space-x-1">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNumber
+                    let pageNumber;
                     if (totalPages <= 5) {
-                      pageNumber = i + 1
+                      pageNumber = i + 1;
                     } else if (currentPage <= 3) {
-                      pageNumber = i + 1
+                      pageNumber = i + 1;
                     } else if (currentPage >= totalPages - 2) {
-                      pageNumber = totalPages - 4 + i
+                      pageNumber = totalPages - 4 + i;
                     } else {
-                      pageNumber = currentPage - 2 + i
+                      pageNumber = currentPage - 2 + i;
                     }
 
                     return (
                       <Button
                         key={pageNumber}
-                        variant={currentPage === pageNumber ? "default" : "outline"}
+                        variant={
+                          currentPage === pageNumber ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => goToPage(pageNumber)}
                         disabled={isLoading}
@@ -979,7 +1089,7 @@ export function DataEntryForm() {
                       >
                         {pageNumber}
                       </Button>
-                    )
+                    );
                   })}
                 </div>
 
@@ -999,5 +1109,5 @@ export function DataEntryForm() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
