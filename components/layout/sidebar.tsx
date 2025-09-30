@@ -18,7 +18,10 @@ import {
   UserCog,
   FilePenIcon,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import LogoutDialog from "../LogoutDialog";
+import { useState } from "react";
 
 export function Sidebar() {
   const { currentUser, logout } = useAuthStore();
@@ -76,6 +79,7 @@ export function Sidebar() {
   const filteredMenuItems = menuItems.filter((item) =>
     item.roles.includes(currentUser?.role || "")
   );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <div
@@ -153,7 +157,7 @@ export function Sidebar() {
             sidebarCollapsed ? "justify-center px-2" : "justify-start"
           )}
           onClick={toggleTheme}
-          title={sidebarCollapsed ? "Toggle Theme" : undefined}
+          title={sidebarCollapsed ? "Toggle Theme" : ""}
         >
           {theme === "light" ? (
             <Moon className={cn("h-4 w-4", !sidebarCollapsed && "mr-3")} />
@@ -165,14 +169,17 @@ export function Sidebar() {
           )}
         </Button>
 
+        {/* Show Dialog based on lifted state */}
+        <LogoutDialog isOpen={isDialogOpen} onOpenChange={setIsDialogOpen} />
+
         <Button
           variant="ghost"
           className={cn(
             "w-full text-white hover:bg-red-600 hover:text-white transition-all duration-200",
             sidebarCollapsed ? "justify-center px-2" : "justify-start"
           )}
-          onClick={handleLogout}
-          title={sidebarCollapsed ? "Sign Out" : undefined}
+          onClick={() => setIsDialogOpen(true)}
+          title={sidebarCollapsed ? "Sign Out" : ""}
         >
           <LogOut className={cn("h-4 w-4", !sidebarCollapsed && "mr-3")} />
           {!sidebarCollapsed && <span>Sign Out</span>}

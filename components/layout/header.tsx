@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import LogoutDialog from "../LogoutDialog";
+import { useState } from "react";
 // Removed toast import from sonner, assuming it's from hooks/use-toast now
 
 export function Header() {
@@ -29,6 +31,7 @@ export function Header() {
   };
 
   // Removed handlePaste function
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 transition-colors duration-200">
@@ -101,11 +104,17 @@ export function Header() {
                 Notifications
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600">
+              <DropdownMenuItem
+                onClick={() => setIsDialogOpen(true)}
+                className="text-red-600"
+              >
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Show Dialog based on lifted state */}
+          <LogoutDialog isOpen={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </div>
       </div>
     </header>
