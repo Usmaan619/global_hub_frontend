@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { postData } from "@/services/api";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 // Removed Copy import
 
 export function LoginForm() {
@@ -41,6 +42,11 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+      // const token = await getRecaptchaToken("contact_form");
+      // console.log('tokensssssssssssssssssssssss: ', token);
+
+
     setLoading(true);
     const lock = await fetchLockStatus();
 

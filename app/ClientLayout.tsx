@@ -7,6 +7,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { useThemeStore } from "@/stores/theme-store";
 import { useGlobalSecurity } from "@/hooks/useGlobalSecurity";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +40,13 @@ export default function ClientLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* Load Google reCAPTCHA v3 globally */}
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=6LdLof0rAAAAAFQvsu9MZvuOdXIK3qCRXpgs_J-n`}
+          strategy="afterInteractive"
+        />
+      </head>
       <body className={inter.className} data-secure-root>
         {children}
         <Toaster />

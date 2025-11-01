@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuthStore, type DataEntry } from "@/stores/auth-store";
@@ -13,6 +13,7 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { useThemeStore } from "@/stores/theme-store";
 import { cn } from "@/lib/utils";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 // Define the form data structure based on DataEntry, excluding ID and timestamps
 type FormData = Omit<DataEntry, "id" | "userId" | "createdAt" | "updatedAt">;
@@ -67,6 +68,14 @@ export default function CreateEntryPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const topRef = useRef(null);
 
+  const [captchaVerified, setCaptchaVerified] = useState<any>("false");
+
+  useEffect(() => {
+    // 🔹 Check if captcha already verified in this session
+    const verified = sessionStorage.getItem("captchaVerified");
+    if (verified === "true") setCaptchaVerified(true);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       // if (currentUser?.role !== "superadmin" && PortalLock) {
@@ -91,16 +100,29 @@ export default function CreateEntryPage() {
         return;
       }
 
+      let recaptchaToken: any = null;
+
+      // Run captcha only once per session
+      console.log("captchaVerified:----------- ", captchaVerified);
+      if (captchaVerified==="false") {
+        recaptchaToken = await getRecaptchaToken();
+        console.log('sssssssssssssssssssddddddddddddddddddddddddddddddddddddddddddddd');
+      }
+      console.log('recaptchaToken: ', recaptchaToken);
+
       setLoading(true);
       formData.image = "text";
       const res = await createDataEntry({
         ...formData,
         user_id: currentUser.id,
+        recaptchaToken,
       });
 
       if (res?.success) {
         showToast("Entry created", "Data entry has been created successfully.");
         resetForm();
+        sessionStorage.setItem("captchaVerified", "true");
+         setCaptchaVerified("true");
 
         if (topRef.current) {
           // topRef.current.scrollTop = 0;
@@ -116,6 +138,7 @@ export default function CreateEntryPage() {
         setLoading(false);
       }
     } catch (error) {
+      console.log('errorsssssssssssssssssscreateDataEntrysssssssss: ', error);
       setLoading(false);
     }
   };

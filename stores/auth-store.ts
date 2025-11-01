@@ -767,9 +767,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (currentUser.role === "superadmin") {
       // allowed
     } else if (currentUser.role === "admin" && userData.role === "user") {
-      console.log('userData: ', userData);
+      console.log("userData: ", userData);
       const adminUsers = users.filter((u) => u.createdBy === currentUser.id);
-      console.log('adminUsers: ', adminUsers);
+      console.log("adminUsers: ", adminUsers);
       if (adminUsers.length >= 5) {
         toast({
           title: "Limit reached",
@@ -890,6 +890,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return { success: true };
     } catch (error) {
+      console.log("error:-----------success: false------------------ ", error);
+
+      if (
+        error?.success === false &&
+        error?.message === "reCAPTCHA verification failed"
+      ) {
+        toast({
+          title: "Warning",
+          description:
+            "If you are using an autotyper, all your entries may be deleted. You will be fully responsible for this action.",
+          variant: "destructive",
+        });
+      }
       return { success: false };
     }
   },
