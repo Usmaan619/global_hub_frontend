@@ -68,14 +68,6 @@ export default function CreateEntryPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const topRef = useRef(null);
 
-  const [captchaVerified, setCaptchaVerified] = useState<any>("false");
-
-  useEffect(() => {
-    // 🔹 Check if captcha already verified in this session
-    const verified = sessionStorage.getItem("captchaVerified");
-    if (verified === "true") setCaptchaVerified(true);
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       // if (currentUser?.role !== "superadmin" && PortalLock) {
@@ -102,14 +94,7 @@ export default function CreateEntryPage() {
 
       let recaptchaToken: any = null;
 
-      // Run captcha only once per session
-      console.log("captchaVerified:----------- ", captchaVerified);
-      if (captchaVerified==="false") {
-        recaptchaToken = await getRecaptchaToken();
-        console.log('sssssssssssssssssssddddddddddddddddddddddddddddddddddddddddddddd');
-      }
-      console.log('recaptchaToken: ', recaptchaToken);
-
+      console.log("recaptchaToken: ", recaptchaToken);
       setLoading(true);
       formData.image = "text";
       const res = await createDataEntry({
@@ -122,7 +107,6 @@ export default function CreateEntryPage() {
         showToast("Entry created", "Data entry has been created successfully.");
         resetForm();
         sessionStorage.setItem("captchaVerified", "true");
-         setCaptchaVerified("true");
 
         if (topRef.current) {
           // topRef.current.scrollTop = 0;
@@ -138,7 +122,7 @@ export default function CreateEntryPage() {
         setLoading(false);
       }
     } catch (error) {
-      console.log('errorsssssssssssssssssscreateDataEntrysssssssss: ', error);
+      console.log("errorsssssssssssssssssscreateDataEntrysssssssss: ", error);
       setLoading(false);
     }
   };

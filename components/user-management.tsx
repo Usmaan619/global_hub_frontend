@@ -41,6 +41,7 @@ import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, FileDown } from "lucide-react";
 import { deleteData, postData } from "@/services/api";
 import axios from "axios";
+import { Switch } from "./ui/switch";
 
 export function UserManagement() {
   const {
@@ -279,6 +280,36 @@ export function UserManagement() {
       }
     } catch (error) {}
   };
+
+  const handleLockUser = async (
+    checked: boolean,
+    user_id: number,
+    user_name: string
+  ) => {
+    console.log("checked:handleLockUser ", checked);
+
+    console.log("user_id:handleLockUser ", user_id);
+    try {
+      if (currentUser?.role === "superadmin") {
+        const res = await postData(`/user/${user_id}/lock`, {
+          is_locked: Number(checked),
+        });
+
+        if (res?.success) {
+          toast({
+            title: checked ? "Locked" : "Unlocked",
+            description: `${user_name}  have been ${
+              checked ? "locked" : "unlocked"
+            } successfully.`,
+          });
+          await fetchAdminAndUser();
+        }
+      }
+    } catch (error) {
+      console.log("error:handleLockAdminUsers ", error);
+    }
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -404,6 +435,7 @@ export function UserManagement() {
                   Total Entrires Created By Users
                 </TableHead>
                 <TableHead className="text-center">Role Name</TableHead>
+                <TableHead className="text-center">Lock User</TableHead>
                 <TableHead className="text-center">Created By</TableHead>
                 <TableHead className="text-center">Created Date</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
@@ -432,6 +464,22 @@ export function UserManagement() {
                       </TableCell>
                       <TableCell className="text-center">
                         {user?.role}
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <Switch
+                          checked={user?.is_locked === 1 ? true : false}
+                          onCheckedChange={(checked) => {
+                            console.log(
+                              "String(user?.is_locked): ",
+                              String(user?.is_locked)
+                            );
+                            console.log("checked:------------- ", checked);
+
+                            handleLockUser(checked, user?.id, user?.name);
+                            console.log("user?.id: ", user?.id);
+                          }}
+                        />
                       </TableCell>
                       <TableCell className="text-center">
                         {user?.created_by}

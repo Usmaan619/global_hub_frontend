@@ -41,6 +41,7 @@ import { toast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
 import { deleteData, postData } from "@/services/api";
 import axios from "axios";
+import { Switch } from "./ui/switch";
 
 export function AmdinManagement() {
   const {
@@ -300,6 +301,38 @@ export function AmdinManagement() {
       }
     } catch (error) {}
   };
+
+  const handleLockAdminUsers = async (
+    checked: boolean,
+    admin_id: number,
+    admin_name: string
+  ) => {
+    
+
+    
+    try {
+      if (currentUser?.role === "superadmin") {
+        const res = await postData(`/admin/${admin_id}/lock`, {
+          is_locked: Number(checked),
+        });
+
+        if (res?.success) {
+          toast({
+            title: checked ? "Locked" : "Unlocked",
+            description: `${admin_name} and all users have been ${
+              checked ? "locked" : "unlocked"
+            } successfully.`,
+          });
+          await fetchAdminAndUser();
+        }
+      }
+    } catch (error) {
+      
+    }
+  };
+
+  
+
   return (
     <Card>
       <CardHeader>
@@ -445,6 +478,8 @@ export function AmdinManagement() {
                   Total Entrires Created By Users
                 </TableHead>
                 <TableHead className="text-center">Role Name</TableHead>
+                <TableHead className="text-center">Lock Admin/Users</TableHead>
+
                 <TableHead className="text-center">User Count</TableHead>
                 <TableHead className="text-center">Created Date</TableHead>
                 <TableHead className="text-center">Actions</TableHead>
@@ -471,6 +506,27 @@ export function AmdinManagement() {
                     <TableCell className="text-center">
                       {user?.role_name}
                     </TableCell>
+
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={user?.is_locked === 1 ? true : false}
+                        onCheckedChange={(checked) => {
+                          console.log(
+                            "String(user?.is_locked): ",
+                            String(user?.is_locked)
+                          );
+                          
+
+                          handleLockAdminUsers(
+                            checked,
+                            user?.admin_id,
+                            user?.name
+                          );
+                          
+                        }}
+                      />
+                    </TableCell>
+
                     <TableCell className="text-center">
                       {user?.user_count}
                     </TableCell>

@@ -40,13 +40,6 @@ export default function ClientLayout({
 
   return (
     <html lang="en">
-      <head>
-        {/* Load Google reCAPTCHA v3 globally */}
-        <Script
-          src={`https://www.google.com/recaptcha/api.js?render=6LdLof0rAAAAAFQvsu9MZvuOdXIK3qCRXpgs_J-n`}
-          strategy="afterInteractive"
-        />
-      </head>
       <body className={inter.className} data-secure-root>
         {children}
         <Toaster />
