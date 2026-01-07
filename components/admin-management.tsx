@@ -42,6 +42,7 @@ import { Plus, Edit, Trash2, Eye, FileDown } from "lucide-react";
 import { deleteData, postData } from "@/services/api";
 import axios from "axios";
 import { Switch } from "./ui/switch";
+import ConfirmDeleteDialog from "./confirmUserDeleteDiaog";
 
 export function AmdinManagement() {
   const {
@@ -54,6 +55,15 @@ export function AmdinManagement() {
     getUsersByAdmin,
     fetchAdminAndUser,
   } = useAuthStore();
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    userId: string | null;
+    type: "admin" | "user" | "entries";
+  }>({
+    open: false,
+    userId: null,
+    type: "user",
+  });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
 
@@ -307,9 +317,6 @@ export function AmdinManagement() {
     admin_id: number,
     admin_name: string
   ) => {
-    
-
-    
     try {
       if (currentUser?.role === "superadmin") {
         const res = await postData(`/admin/${admin_id}/lock`, {
@@ -326,44 +333,543 @@ export function AmdinManagement() {
           await fetchAdminAndUser();
         }
       }
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
-  
-
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle>Admin Management</CardTitle>
-            <CardDescription>
-              Manage Admins and their permissions
-            </CardDescription>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Admin Management</CardTitle>
+              <CardDescription>
+                Manage Admins and their permissions
+              </CardDescription>
+            </div>
+            {canCreateUsers && (
+              <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={(o: any) => {
+                  setIsCreateDialogOpen(o);
+                  resetForm();
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Admin
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Admin</DialogTitle>
+                    <DialogDescription>
+                      Add a new admin to the system
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form
+                    spellCheck="false"
+                    autoCapitalize="false"
+                    autoComplete="off"
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="name">Name</Label>
+                        {/* Removed Paste Button */}
+                      </div>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="userName">Username</Label>
+                        {/* Removed Paste Button */}
+                      </div>
+                      <Input
+                        id="userName"
+                        value={formData.userName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, userName: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password">password</Label>
+                        {/* Removed Paste Button */}
+                      </div>
+                      <Input
+                        id="password"
+                        type="Text"
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role</Label>
+                      <Select
+                        value={formData.role}
+                        onValueChange={(value: "admin") => {
+                          setFormData({ ...formData, role: value });
+                          setShowUserLimit(value);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableRoles.map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {formData.role === "admin" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="user_limit">User limit</Label>
+                          {/* Removed Paste Button */}
+                        </div>
+                        <Input
+                          id="user_limit"
+                          type="number"
+                          value={formData.user_limit}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              user_limit: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                    )}
+                    <Button type="submit" className="w-full">
+                      Create Admin
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-          {canCreateUsers && (
-            <Dialog
-              open={isCreateDialogOpen}
-              onOpenChange={(o: any) => {
-                setIsCreateDialogOpen(o);
-                resetForm();
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Admin
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
+        </CardHeader>
+        <CardContent>
+          {currentUser?.role === "superadmin" && (
+            <Table>
+              <TableHeader>
+                <TableRow className="flex-row justify-center w-full">
+                  <TableHead className="text-center">No.</TableHead>
+                  <TableHead className="text-center">Name</TableHead>
+                  <TableHead className="text-center">Username</TableHead>
+                  <TableHead className="text-center">password</TableHead>
+                  <TableHead className="text-center">
+                    User Create Limit
+                  </TableHead>
+                  <TableHead className="text-center">
+                    Total Entrires Created By Users
+                  </TableHead>
+                  <TableHead className="text-center">Role Name</TableHead>
+                  <TableHead className="text-center">
+                    Lock Admin/Users
+                  </TableHead>
+
+                  <TableHead className="text-center">User Count</TableHead>
+                  <TableHead className="text-center">Created Date</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {AdminData?.admins?.length > 0 ? (
+                  AdminData.admins.map((user: any, idx: any) => (
+                    <TableRow key={idx}>
+                      <TableCell className="text-center">{idx + 1}</TableCell>
+                      <TableCell className="text-center">
+                        {user?.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.username}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.admin_password}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.user_limit}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.total_records_created_by_users}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.role_name}
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <Switch
+                          checked={user?.is_locked === 1 ? true : false}
+                          onCheckedChange={(checked) => {
+                            console.log(
+                              "String(user?.is_locked): ",
+                              String(user?.is_locked)
+                            );
+
+                            handleLockAdminUsers(
+                              checked,
+                              user?.admin_id,
+                              user?.name
+                            );
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        {user?.user_count}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {new Date(user?.admin_created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-center justify-center">
+                        <div className="flex space-x-2 justify-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="View Admin Details"
+                            onClick={() => setViewUser(user)} //
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="Edit Admin Details"
+                            onClick={() => handleEdit(user)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            title="Delete Admin"
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                userId: user.admin_id,
+                                type: "admin",
+                              })
+                            }
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          {/* <Button
+                          variant="outline"
+                          size="sm"
+                          title="Delete Admin And All Users Details"
+                          onClick={() => handleDelete(user?.admin_id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button> */}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">
+                      No admins found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+
+          {currentUser?.role === "admin" && (
+            <Table>
+              <TableHeader>
+                <TableRow className="flex-row justify-center w-full">
+                  <TableHead className="text-center">No.</TableHead>
+                  <TableHead className="text-center">Name</TableHead>
+                  <TableHead className="text-center">Username</TableHead>
+                  <TableHead className="text-center">Password</TableHead>
+                  <TableHead className="text-center">
+                    Total Entries Created
+                  </TableHead>
+                  <TableHead className="text-center">Role</TableHead>
+                  <TableHead className="text-center">Created Date</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {AdminData?.admin_users?.length > 0 ? (
+                  AdminData.admin_users.map((user: any, idx: any) => (
+                    <TableRow key={idx}>
+                      <TableCell className="text-center">{idx + 1}</TableCell>
+                      <TableCell className="text-center">
+                        {user?.name}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.username}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.password}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.record_count}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user?.role}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {new Date(user?.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-center justify-center">
+                        <div className="flex space-x-2 justify-center">
+                          {/* <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setViewUser(user)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button> */}
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDonwloadCSV(user)}
+                          >
+                            <FileDown color="green" size={23} />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(user)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                userId: user.id,
+                                type: "user",
+                              })
+                            }
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">
+                      No data found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+
+          {}
+          {viewUser && (
+            <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
+              <DialogContent className="max-w-7xl">
                 <DialogHeader>
-                  <DialogTitle>Create New Admin</DialogTitle>
+                  <DialogTitle>
+                    {currentUser?.role === "superadmin"
+                      ? "Admin & Users Details"
+                      : "Users Details"}{" "}
+                  </DialogTitle>
+                  <DialogDescription>Complete information</DialogDescription>
+                </DialogHeader>
+
+                {/* 🧑 Admin Table */}
+                <div className="mt-4">
+                  <h4 className="text-lg font-semibold mb-2">Admin Info</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-center">Name</TableHead>
+                        <TableHead className="text-center">Username</TableHead>
+                        <TableHead className="text-center">Password</TableHead>
+                        <TableHead className="text-center">Role</TableHead>
+                        <TableHead className="text-center">
+                          User Limit
+                        </TableHead>
+                        <TableHead className="text-center">
+                          Total Entrires Created By Users
+                        </TableHead>
+
+                        <TableHead className="text-center">
+                          User Count
+                        </TableHead>
+                        <TableHead className="text-center">
+                          Created At
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="text-center">
+                          {viewUser.name}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser.username}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser.admin_password}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser.role_name}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser.user_limit || "N/A"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser?.total_records_created_by_users}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {viewUser.user_count}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {new Date(
+                            viewUser.admin_created_at
+                          ).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* 👥 Users Table */}
+                {viewUser?.users?.length > 0 ? (
+                  <div className="mt-6">
+                    <h4 className="text-lg font-semibold mb-2">
+                      Users under this Admin ({viewUser.users.length})
+                    </h4>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-center">No.</TableHead>
+                          <TableHead className="text-center">Name</TableHead>
+                          <TableHead className="text-center">
+                            Username
+                          </TableHead>
+                          <TableHead className="text-center">
+                            Password
+                          </TableHead>
+                          <TableHead className="text-center">Role</TableHead>
+                          <TableHead className="text-center">
+                            User Entrires Count
+                          </TableHead>
+                          <TableHead className="text-center">
+                            Created At
+                          </TableHead>
+
+                          <TableHead className="text-center">
+                            Download Excel
+                          </TableHead>
+                          <TableHead className="text-center">
+                            Delete All Entries
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {viewUser.users.map((u: any, i: number) => (
+                          <TableRow key={u.id}>
+                            <TableCell className="text-center">
+                              {i + 1}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {u.name}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {u.username}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {u.password}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {u.role}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {u.record_count}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {new Date(u.created_at).toLocaleDateString()}
+                            </TableCell>
+
+                            <TableCell className="text-center justify-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                title="Download Excel"
+                                onClick={() => handleDonwloadCSV(u)}
+                              >
+                                <FileDown color="green" size={23} />
+                              </Button>
+                            </TableCell>
+
+                            <TableCell className="text-center justify-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  setDeleteDialog({
+                                    open: true,
+                                    userId: u.id,
+                                    type: "entries",
+                                  })
+                                }
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground mt-4">
+                    No users found under this admin.
+                  </p>
+                )}
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {editingUser && (
+            <Dialog
+              open={!!editingUser}
+              onOpenChange={() => setEditingUser(null)}
+            >
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Admin</DialogTitle>
                   <DialogDescription>
-                    Add a new admin to the system
+                    Update admin information
                   </DialogDescription>
                 </DialogHeader>
+
+                {/* 🔧 Edit Form */}
                 <form
                   spellCheck="false"
                   autoCapitalize="false"
@@ -372,12 +878,9 @@ export function AmdinManagement() {
                   className="space-y-4"
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="name">Name</Label>
-                      {/* Removed Paste Button */}
-                    </div>
+                    <Label htmlFor="edit-name">Name</Label>
                     <Input
-                      id="name"
+                      id="edit-name"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
@@ -385,13 +888,11 @@ export function AmdinManagement() {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="userName">Username</Label>
-                      {/* Removed Paste Button */}
-                    </div>
+                    <Label htmlFor="edit-username">Username</Label>
                     <Input
-                      id="userName"
+                      id="edit-username"
                       value={formData.userName}
                       onChange={(e) =>
                         setFormData({ ...formData, userName: e.target.value })
@@ -399,14 +900,12 @@ export function AmdinManagement() {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">password</Label>
-                      {/* Removed Paste Button */}
-                    </div>
+                    <Label htmlFor="edit-password">Password</Label>
                     <Input
-                      id="password"
-                      type="Text"
+                      id="edit-password"
+                      type="text"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
@@ -414,35 +913,11 @@ export function AmdinManagement() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Role</Label>
-                    <Select
-                      value={formData.role}
-                      onValueChange={(value: "admin") => {
-                        setFormData({ ...formData, role: value });
-                        setShowUserLimit(value);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableRoles.map((role) => (
-                          <SelectItem key={role} value={role}>
-                            {role.charAt(0).toUpperCase() + role.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {formData.role === "admin" && (
+                  {currentUser?.role === "superadmin" && (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="user_limit">User limit</Label>
-                        {/* Removed Paste Button */}
-                      </div>
+                      <Label htmlFor="edit-user-limit">User Limit</Label>
                       <Input
-                        id="user_limit"
+                        id="edit-user-limit"
                         type="number"
                         value={formData.user_limit}
                         onChange={(e) =>
@@ -455,475 +930,88 @@ export function AmdinManagement() {
                       />
                     </div>
                   )}
+
                   <Button type="submit" className="w-full">
-                    Create Admin
+                    Update Admin
                   </Button>
                 </form>
+
+                {/* 📋 Show User List if editing admin */}
+                {editingUser?.role === "admin" &&
+                  editingUser?.users?.length > 0 && (
+                    <>
+                      <hr className="my-6" />
+                      <h4 className="text-lg font-semibold mb-2">
+                        Users under {editingUser.name}
+                      </h4>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>No.</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Username</TableHead>
+                            <TableHead>Password</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Created At</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {editingUser.users.map((u: any, i: number) => (
+                            <TableRow key={u.id}>
+                              <TableCell>{i + 1}</TableCell>
+                              <TableCell>{u.name}</TableCell>
+                              <TableCell>{u.username}</TableCell>
+                              <TableCell>{u.password}</TableCell>
+                              <TableCell>{u.role}</TableCell>
+                              <TableCell>
+                                {new Date(u.created_at).toLocaleDateString()}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </>
+                  )}
               </DialogContent>
             </Dialog>
           )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {currentUser?.role === "superadmin" && (
-          <Table>
-            <TableHeader>
-              <TableRow className="flex-row justify-center w-full">
-                <TableHead className="text-center">No.</TableHead>
-                <TableHead className="text-center">Name</TableHead>
-                <TableHead className="text-center">Username</TableHead>
-                <TableHead className="text-center">password</TableHead>
-                <TableHead className="text-center">User Create Limit</TableHead>
-                <TableHead className="text-center">
-                  Total Entrires Created By Users
-                </TableHead>
-                <TableHead className="text-center">Role Name</TableHead>
-                <TableHead className="text-center">Lock Admin/Users</TableHead>
+        </CardContent>
+      </Card>
 
-                <TableHead className="text-center">User Count</TableHead>
-                <TableHead className="text-center">Created Date</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {AdminData?.admins?.length > 0 ? (
-                AdminData.admins.map((user: any, idx: any) => (
-                  <TableRow key={idx}>
-                    <TableCell className="text-center">{idx + 1}</TableCell>
-                    <TableCell className="text-center">{user?.name}</TableCell>
-                    <TableCell className="text-center">
-                      {user?.username}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.admin_password}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.user_limit}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.total_records_created_by_users}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.role_name}
-                    </TableCell>
+      <ConfirmDeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+        title={
+          deleteDialog.type === "admin"
+            ? "Delete Admin?"
+            : deleteDialog.type === "entries"
+            ? "Delete All Entries?"
+            : "Delete User?"
+        }
+        description={
+          deleteDialog.type === "admin"
+            ? "This will permanently delete the admin and all related users."
+            : deleteDialog.type === "entries"
+            ? "This will permanently delete all records created by this user."
+            : "This will permanently delete the user."
+        }
+        confirmText="Yes, Delete"
+        onConfirm={async () => {
+          if (!deleteDialog.userId) return;
 
-                    <TableCell className="text-center">
-                      <Switch
-                        checked={user?.is_locked === 1 ? true : false}
-                        onCheckedChange={(checked) => {
-                          console.log(
-                            "String(user?.is_locked): ",
-                            String(user?.is_locked)
-                          );
-                          
+          if (deleteDialog.type === "entries") {
+            await handleDeleteAllEntriesByUser(deleteDialog.userId);
+          } else {
+            await handleDelete(deleteDialog.userId);
+          }
 
-                          handleLockAdminUsers(
-                            checked,
-                            user?.admin_id,
-                            user?.name
-                          );
-                          
-                        }}
-                      />
-                    </TableCell>
-
-                    <TableCell className="text-center">
-                      {user?.user_count}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {new Date(user?.admin_created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-center justify-center">
-                      <div className="flex space-x-2 justify-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="View Admin Details"
-                          onClick={() => setViewUser(user)} //
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="Edit Admin Details"
-                          onClick={() => handleEdit(user)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="Delete Admin And All Users Details"
-                          onClick={() => handleDelete(user?.admin_id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center">
-                    No admins found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-
-        {currentUser?.role === "admin" && (
-          <Table>
-            <TableHeader>
-              <TableRow className="flex-row justify-center w-full">
-                <TableHead className="text-center">No.</TableHead>
-                <TableHead className="text-center">Name</TableHead>
-                <TableHead className="text-center">Username</TableHead>
-                <TableHead className="text-center">Password</TableHead>
-                <TableHead className="text-center">
-                  Total Entries Created
-                </TableHead>
-                <TableHead className="text-center">Role</TableHead>
-                <TableHead className="text-center">Created Date</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {AdminData?.admin_users?.length > 0 ? (
-                AdminData.admin_users.map((user: any, idx: any) => (
-                  <TableRow key={idx}>
-                    <TableCell className="text-center">{idx + 1}</TableCell>
-                    <TableCell className="text-center">{user?.name}</TableCell>
-                    <TableCell className="text-center">
-                      {user?.username}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.password}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user?.record_count}
-                    </TableCell>
-                    <TableCell className="text-center">{user?.role}</TableCell>
-                    <TableCell className="text-center">
-                      {new Date(user?.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-center justify-center">
-                      <div className="flex space-x-2 justify-center">
-                        {/* <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setViewUser(user)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button> */}
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDonwloadCSV(user)}
-                        >
-                          <FileDown color="green" size={23} />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(user)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(user?.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center">
-                    No data found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-
-        {}
-        {viewUser && (
-          <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
-            <DialogContent className="max-w-7xl">
-              <DialogHeader>
-                <DialogTitle>
-                  {currentUser?.role === "superadmin"
-                    ? "Admin & Users Details"
-                    : "Users Details"}{" "}
-                </DialogTitle>
-                <DialogDescription>Complete information</DialogDescription>
-              </DialogHeader>
-
-              {/* 🧑 Admin Table */}
-              <div className="mt-4">
-                <h4 className="text-lg font-semibold mb-2">Admin Info</h4>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-center">Name</TableHead>
-                      <TableHead className="text-center">Username</TableHead>
-                      <TableHead className="text-center">Password</TableHead>
-                      <TableHead className="text-center">Role</TableHead>
-                      <TableHead className="text-center">User Limit</TableHead>
-                      <TableHead className="text-center">
-                        Total Entrires Created By Users
-                      </TableHead>
-
-                      <TableHead className="text-center">User Count</TableHead>
-                      <TableHead className="text-center">Created At</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="text-center">
-                        {viewUser.name}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser.username}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser.admin_password}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser.role_name}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser.user_limit || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser?.total_records_created_by_users}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {viewUser.user_count}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {new Date(
-                          viewUser.admin_created_at
-                        ).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-
-              {/* 👥 Users Table */}
-              {viewUser?.users?.length > 0 ? (
-                <div className="mt-6">
-                  <h4 className="text-lg font-semibold mb-2">
-                    Users under this Admin ({viewUser.users.length})
-                  </h4>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-center">No.</TableHead>
-                        <TableHead className="text-center">Name</TableHead>
-                        <TableHead className="text-center">Username</TableHead>
-                        <TableHead className="text-center">Password</TableHead>
-                        <TableHead className="text-center">Role</TableHead>
-                        <TableHead className="text-center">
-                          User Entrires Count
-                        </TableHead>
-                        <TableHead className="text-center">
-                          Created At
-                        </TableHead>
-
-                        <TableHead className="text-center">
-                          Download Excel
-                        </TableHead>
-                        <TableHead className="text-center">
-                          Delete All Entries
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {viewUser.users.map((u: any, i: number) => (
-                        <TableRow key={u.id}>
-                          <TableCell className="text-center">{i + 1}</TableCell>
-                          <TableCell className="text-center">
-                            {u.name}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {u.username}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {u.password}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {u.role}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {u.record_count}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {new Date(u.created_at).toLocaleDateString()}
-                          </TableCell>
-
-                          <TableCell className="text-center justify-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              title="Download Excel"
-                              onClick={() => handleDonwloadCSV(u)}
-                            >
-                              <FileDown color="green" size={23} />
-                            </Button>
-                          </TableCell>
-
-                          <TableCell className="text-center justify-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              title="Delete All Entries For This User"
-                              onClick={() =>
-                                handleDeleteAllEntriesByUser(u?.id)
-                              }
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <p className="text-muted-foreground mt-4">
-                  No users found under this admin.
-                </p>
-              )}
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {editingUser && (
-          <Dialog
-            open={!!editingUser}
-            onOpenChange={() => setEditingUser(null)}
-          >
-            <DialogContent className="max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Edit Admin</DialogTitle>
-                <DialogDescription>Update admin information</DialogDescription>
-              </DialogHeader>
-
-              {/* 🔧 Edit Form */}
-              <form
-                spellCheck="false"
-                autoCapitalize="false"
-                autoComplete="off"
-                onSubmit={handleSubmit}
-                className="space-y-4"
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="edit-name">Name</Label>
-                  <Input
-                    id="edit-name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-username">Username</Label>
-                  <Input
-                    id="edit-username"
-                    value={formData.userName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, userName: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-password">Password</Label>
-                  <Input
-                    id="edit-password"
-                    type="text"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                {currentUser?.role === "superadmin" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-user-limit">User Limit</Label>
-                    <Input
-                      id="edit-user-limit"
-                      type="number"
-                      value={formData.user_limit}
-                      onChange={(e) =>
-                        setFormData({ ...formData, user_limit: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-                )}
-
-                <Button type="submit" className="w-full">
-                  Update Admin
-                </Button>
-              </form>
-
-              {/* 📋 Show User List if editing admin */}
-              {editingUser?.role === "admin" &&
-                editingUser?.users?.length > 0 && (
-                  <>
-                    <hr className="my-6" />
-                    <h4 className="text-lg font-semibold mb-2">
-                      Users under {editingUser.name}
-                    </h4>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>No.</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Username</TableHead>
-                          <TableHead>Password</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Created At</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {editingUser.users.map((u: any, i: number) => (
-                          <TableRow key={u.id}>
-                            <TableCell>{i + 1}</TableCell>
-                            <TableCell>{u.name}</TableCell>
-                            <TableCell>{u.username}</TableCell>
-                            <TableCell>{u.password}</TableCell>
-                            <TableCell>{u.role}</TableCell>
-                            <TableCell>
-                              {new Date(u.created_at).toLocaleDateString()}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </>
-                )}
-            </DialogContent>
-          </Dialog>
-        )}
-      </CardContent>
-    </Card>
+          setDeleteDialog({
+            open: false,
+            userId: null,
+            type: "user",
+          });
+        }}
+      />
+    </>
   );
 }
