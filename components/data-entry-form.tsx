@@ -35,6 +35,17 @@ import { Badge } from "@/components/ui/badge";
 import { deleteData } from "@/services/api";
 import moment from "moment";
 import { useDebounce } from "@/hooks/use-debounce";
+// State aur imports mein ye add karo (upar ke imports ke baad)
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Users } from "lucide-react";
+
+// Component ke state mein ye add karo (searchTerm ke saath)
 
 export function DataEntryForm() {
   const {
@@ -44,6 +55,7 @@ export function DataEntryForm() {
     users,
     setDataEntryId,
     totalEntries,
+    AdminData,
     currentPage: storePage,
     itemsPerPage: storeItemsPerPage,
     fetchDataEntries,
@@ -53,41 +65,61 @@ export function DataEntryForm() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("all");
+  console.log("selectedUserId: ", selectedUserId);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const router = useRouter();
 
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     setIsLoading(true);
+  //     fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm).finally(
+  //       () => {
+  //         setIsLoading(false);
+  //       }
+  //     );
+  //   }
+  // }, [
+  //   currentUser,
+  //   currentPage,
+  //   debouncedSearchTerm,
+  //   fetchDataEntries,
+  //   itemsPerPage,
+  // ]);
+
   useEffect(() => {
     if (currentUser) {
       setIsLoading(true);
-      fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm).finally(
-        () => {
-          setIsLoading(false);
-        }
-      );
+      fetchDataEntries(
+        currentPage,
+        itemsPerPage,
+        debouncedSearchTerm,
+        selectedUserId
+      ).finally(() => setIsLoading(false));
     }
   }, [
     currentUser,
     currentPage,
     debouncedSearchTerm,
+    selectedUserId,
     fetchDataEntries,
     itemsPerPage,
   ]);
 
-  useEffect(() => {
-    if (debouncedSearchTerm !== searchTerm) {
-      setCurrentPage(1); // Reset to first page when searching
-    }
-  }, [debouncedSearchTerm, searchTerm]);
+  // useEffect(() => {
+  //   if (debouncedSearchTerm !== searchTerm) {
+  //     setCurrentPage(1); // Reset to first page when searching
+  //   }
+  // }, [debouncedSearchTerm, searchTerm]);
 
+  useEffect(() => {
+    setCurrentPage(1); // User change ya search pe page reset
+  }, [debouncedSearchTerm, selectedUserId]);
   const clearSearch = () => {
     setSearchTerm("");
-  };
-
-  const getUserName = (userId: string) => {
-    const user = users.find((u) => u.id === userId);
-    return user?.name || "Unknown User";
+    setSelectedUserId("");
   };
 
   const handleDelete = async (entryId: number) => {
@@ -96,7 +128,13 @@ export function DataEntryForm() {
 
       if (res?.success) {
         deleteDataEntry(entryId?.toString());
-        fetchDataEntries(currentPage, itemsPerPage, debouncedSearchTerm);
+        // selectedUserId bhi bhejo
+        fetchDataEntries(
+          currentPage,
+          itemsPerPage,
+          debouncedSearchTerm,
+          selectedUserId
+        );
         toast({
           title: "Entry deleted",
           description: "Data entry has been deleted successfully.",
@@ -104,7 +142,6 @@ export function DataEntryForm() {
       }
     } catch (error) {
       const err = error as any;
-
       toast({
         title: err?.message || "Error",
         description: "Failed to delete entry.",
@@ -159,7 +196,7 @@ export function DataEntryForm() {
         </CardHeader>
         <CardContent>
           {/* Enhanced Search */}
-          <div className="flex items-center space-x-2 mb-6">
+          {/* <div className="flex items-center space-x-2 mb-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -187,8 +224,62 @@ export function DataEntryForm() {
                 Loading...
               </Badge>
             )}
-          </div>
+          </div> */}
+          <div className="flex items-center space-x-2 mb-6">
+            {/* User Dropdown - sirf admin ke liye */}
+            {currentUser?.role === "admin" && (
+              <div className="w-64">
+                <Select
+                  value={selectedUserId}
+                  onValueChange={setSelectedUserId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select User" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">👥 All My Users</SelectItem>
+                    {AdminData?.admin_users
+                      ?.filter((user: any) => user.admin_id === currentUser.id)
+                      ?.map((user: any) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search by record no"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-10 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+              />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+
+            <Badge variant="secondary" className="px-3 py-1">
+              {totalEntries || 0} total
+            </Badge>
+            {isLoading && (
+              <Badge variant="outline" className="px-3 py-1">
+                Loading...
+              </Badge>
+            )}
+          </div>
           {/* Entries Table */}
           <div className="rounded-lg border overflow-hidden">
             <Table>
@@ -491,7 +582,7 @@ export function DataEntryForm() {
                       <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {moment(entry?.created_at).format("DD/MM/YYYY, h:mm a")}
                       </TableCell>
-                         <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
+                      <TableCell className="max-w-[200px] truncate overflow-hidden whitespace-nowrap w-48">
                         {moment(entry?.updated_at).format("DD/MM/YYYY, h:mm a")}
                       </TableCell>
                     </TableRow>
@@ -500,7 +591,6 @@ export function DataEntryForm() {
               </TableBody>
             </Table>
           </div>
-
           {/* Pagination Controls */}
           {totalEntries > 0 && (
             <div className="flex items-center justify-between mt-6">

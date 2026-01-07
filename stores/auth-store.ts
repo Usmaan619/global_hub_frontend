@@ -1001,49 +1001,108 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   getDataEntriesByUser: (userId) => {
     return get().dataEntries.filter((entry) => entry?.id === userId);
   },
+  fetchDataEntries: async (
+  page = 1,
+  limit = 10,
+  search = "",
+  userId = "all"
+) => {
+  const { currentUser } = get();
+  if (!currentUser) return;
 
-  fetchDataEntries: async (page = 1, limit = 10, search = "") => {
-    const { currentUser } = get();
+  const lockRes = await get().fetchLockStatus();
+  if (currentUser.role !== "superadmin" && lockRes) {
+    get().logout();
+    window.location.href = "/";
+    toast({
+      title: "Portal Locked",
+      description: "Access is currently restricted.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    // Check for portal lock
-    const lockRes = await get().fetchLockStatus();
-    if (currentUser?.role !== "superadmin" && lockRes) {
-      get().logout();
-      window.location.href = "/";
-      toast({
-        title: "Portal Locked",
-        description: "Access is currently restricted. Please try again later.",
-        variant: "destructive",
-      });
-      return;
+  try {
+    const params = new URLSearchParams({
+      role: currentUser.role,
+      page: String(page),
+      limit: String(limit),
+    });
+
+    // 🔑 ADMIN LOGIC (FINAL)
+    if (currentUser.role === "admin") {
+      params.set("id", currentUser.id);     // ✅ adminId
+      params.set("scope", userId || "all"); // ✅ all | userId
+    } else {
+      params.set("id", currentUser.id);     // user / superadmin
     }
 
-    if (!currentUser) return;
+    if (search) params.set("search", search);
 
-    try {
-      const res: any = await getData(
-        `get/all/records?id=${currentUser?.id}&role=${currentUser?.role}&page=${page}&limit=${limit}&search=${search}`
-      );
+    const res: any = await getData(
+      `get/all/records?${params.toString()}`
+    );
 
-      console.log("API Response: ", res);
-
-      if (res?.record) {
-        set({
-          dataEntries: res?.record?.data,
-          totalEntries: res?.record?.total,
-          currentPage: res?.record?.page,
-          itemsPerPage: res?.record?.limit,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching paginated records:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch data entries",
-        variant: "destructive",
+    if (res?.record) {
+      set({
+        dataEntries: res.record.data,
+        totalEntries: res.record.total,
+        currentPage: res.record.page,
+        itemsPerPage: res.record.limit,
       });
     }
-  },
+  } catch (err) {
+    toast({
+      title: "Error",
+      description: "Failed to fetch data entries",
+      variant: "destructive",
+    });
+  }
+},
+
+
+  // fetchDataEntries: async (page = 1, limit = 10, search = "") => {
+  //   const { currentUser } = get();
+
+  //   // Check for portal lock
+  //   const lockRes = await get().fetchLockStatus();
+  //   if (currentUser?.role !== "superadmin" && lockRes) {
+  //     get().logout();
+  //     window.location.href = "/";
+  //     toast({
+  //       title: "Portal Locked",
+  //       description: "Access is currently restricted. Please try again later.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
+
+  //   if (!currentUser) return;
+
+  //   try {
+  //     const res: any = await getData(
+  //       `get/all/records?id=${currentUser?.id}&role=${currentUser?.role}&page=${page}&limit=${limit}&search=${search}`
+  //     );
+
+  //     console.log("API Response: ", res);
+
+  //     if (res?.record) {
+  //       set({
+  //         dataEntries: res?.record?.data,
+  //         totalEntries: res?.record?.total,
+  //         currentPage: res?.record?.page,
+  //         itemsPerPage: res?.record?.limit,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching paginated records:", error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to fetch data entries",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // },
 
   fetchCountAdminAndUser: async () => {
     const { currentUser } = get();
